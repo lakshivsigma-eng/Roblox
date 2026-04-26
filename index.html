@@ -2,80 +2,116 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Brookhaven Ultra RP - Working Version</title>
+    <title>Brookhaven Supreme RP</title>
     <style>
-        body { margin: 0; background: #87CEEB; overflow: hidden; perspective: 1200px; font-family: 'Segoe UI', sans-serif; }
-        #world { position: absolute; width: 100vw; height: 100vh; transform-style: preserve-3d; transform: rotateX(65deg) translateY(-400px); transition: transform 0.05s linear; }
+        :root { --r-blue: #00A2FF; }
+        body { margin: 0; background: #87CEEB; overflow: hidden; font-family: 'Segoe UI', sans-serif; perspective: 1000px; }
         
-        /* MAP */
-        .grass { position: absolute; width: 8000px; height: 8000px; background: #567d46; top: -4000px; left: -4000px; transform: translateZ(0); }
-        .road { position: absolute; width: 120px; height: 8000px; background: #333; top: -4000px; left: 50%; transform: translateX(-50%) translateZ(1px); border-left: 15px solid #eee; border-right: 15px solid #eee; }
-        
-        /* HOUSES */
-        .house { position: absolute; width: 100px; height: 80px; background: white; transform: translateZ(40px); border: 3px solid #ccc; display: none; }
-        .roof { position: absolute; width: 100px; height: 100px; background: #444; transform: translateY(-30px) rotateX(-45deg); top: -20px; }
+        /* 3D WORLD */
+        #world { position: absolute; width: 100vw; height: 100vh; transform-style: preserve-3d; transition: transform 0.05s linear; }
+        .grass { position: absolute; width: 10000px; height: 10000px; background: #567d46; top: -5000px; left: -5000px; transform: rotateX(90deg); }
+        .road { position: absolute; width: 150px; height: 10000px; background: #333; left: 50%; top: -5000px; transform: translateX(-50%) rotateX(90deg) translateZ(1px); border-left: 10px solid #fff; border-right: 10px solid #fff; }
 
-        /* CAR & PLAYER */
-        #car { display: none; position: absolute; width: 50px; height: 90px; background: #001144; border-radius: 8px; transform: translateZ(15px); border: 3px solid black; }
-        .light { position: absolute; bottom: 0; width: 12px; height: 6px; background: red; }
-        #player { position: absolute; width: 25px; height: 25px; background: #222; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(20px); border-radius: 50%; }
+        /* BUILDINGS & INTERIORS */
+        .house { position: absolute; width: 150px; height: 100px; background: #fff; transform: translate3d(200px, -50px, -300px); border: 4px solid #444; }
+        .door { position: absolute; bottom: 0; left: 60px; width: 30px; height: 50px; background: #4a2c1d; transition: 0.5s; cursor: pointer; transform-origin: left; }
+        .interior { position: absolute; width: 100%; height: 100%; background: #ddd; transform: translateZ(-10px); }
 
-        /* UI BUTTONS */
+        /* AVATAR & CAR */
+        #player { position: absolute; width: 30px; height: 30px; background: #222; left: 50%; top: 50%; transform: translate(-50%, -50%) translateZ(20px); border-radius: 50%; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+        #car { display: none; position: absolute; width: 60px; height: 110px; background: #001144; left: 50%; top: 50%; transform: translate(-50%, -50%) translateZ(15px); border-radius: 10px; border: 4px solid #000; }
+
+        /* UI / HUD */
         #gui { position: fixed; inset: 0; pointer-events: none; z-index: 1000; }
-        .menu { position: absolute; pointer-events: auto; display: flex; gap: 10px; }
-        .top-left { top: 20px; left: 20px; }
-        .side-right { right: 20px; top: 50%; transform: translateY(-50%); flex-direction: column; }
+        .panel { position: absolute; pointer-events: auto; background: rgba(0,0,0,0.6); padding: 10px; border-radius: 15px; display: flex; flex-direction: column; gap: 10px; border: 2px solid rgba(255,255,255,0.2); }
+        .left-ui { top: 20px; left: 20px; }
+        .right-ui { top: 50%; right: 20px; transform: translateY(-50%); }
+        .bottom-ui { bottom: 20px; left: 50%; transform: translateX(-50%); flex-direction: row; }
         
-        .btn { width: 55px; height: 55px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; border: 3px solid #ddd; box-shadow: 0 5px 0 #bbb; }
-        .btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #bbb; }
+        .btn { width: 50px; height: 50px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 25px; cursor: pointer; border: none; box-shadow: 0 4px #bbb; transition: 0.1s; }
+        .btn:active { transform: translateY(4px); box-shadow: 0 0 #bbb; }
+        .btn.active { background: var(--r-blue); color: white; }
+
+        #job-tag { position: absolute; top: 20px; right: 20px; color: white; font-weight: bold; background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 20px; pointer-events: auto; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="gui">
-        <div class="menu top-left">
-            <div class="btn" onclick="spawnHouse()">🏠</div>
+        <div id="job-tag" onclick="changeJob()">👔 Job: Citizen</div>
+        
+        <div class="panel left-ui">
+            <div class="btn" onclick="toggleHouse()">🏠</div>
+            <div class="btn" onclick="robBank()">💰</div>
         </div>
-        <div class="menu side-right">
+
+        <div class="panel right-ui">
+            <div class="btn" onclick="toggleView()" id="viewBtn">👁️</div>
             <div class="btn" onclick="spawnCar()">🚗</div>
+            <div class="btn" onclick="spawnPet()">🐶</div>
             <div class="btn" onclick="location.reload()">🔄</div>
+        </div>
+
+        <div class="panel bottom-ui">
+            <div class="btn" onclick="equip('🍕')">🍕</div>
+            <div class="btn" onclick="equip('📱')">📱</div>
+            <div class="btn" onclick="equip('🔫')">🔫</div>
+            <div class="btn" onclick="equip('🕯️')">🕯️</div>
         </div>
     </div>
 
     <div id="world">
         <div class="grass"></div>
         <div class="road"></div>
-        <div class="house" id="myHouse"><div class="roof"></div></div>
-        <div id="car"><div class="light" style="left:5px"></div><div class="light" style="right:5px"></div></div>
+        
+        <!-- THE MAIN HOUSE -->
+        <div class="house" id="house1">
+            <div class="interior"></div>
+            <div class="door" onclick="this.style.transform='rotateY(-90deg)'"></div>
+            <div style="position:absolute; top:-40px; width:100%; height:40px; background:#444;"></div>
+        </div>
+
+        <div id="car"></div>
         <div id="player"></div>
     </div>
 
     <script>
-        let px = 0, py = 0, isInCar = false;
+        let px = 0, py = 0, pz = 0;
+        let isFirstPerson = false;
+        let isInCar = false;
+        let money = 5000;
         const world = document.getElementById('world');
-        const player = document.getElementById('player');
-        const car = document.getElementById('car');
         const keys = {};
 
         window.onkeydown = (e) => keys[e.code] = true;
         window.onkeyup = (e) => keys[e.code] = false;
 
-        // --- BUTTON ACTIONS ---
-        function spawnCar() {
-            isInCar = true;
-            car.style.display = 'block';
-            player.style.opacity = '0';
-            // Put car where player is
-            car.style.left = `calc(50% - ${px + 25}px)`;
-            car.style.top = `calc(50% - ${py}px)`;
+        function toggleView() {
+            isFirstPerson = !isFirstPerson;
+            document.getElementById('viewBtn').classList.toggle('active');
+            document.getElementById('player').style.opacity = isFirstPerson ? "0" : "1";
         }
 
-        function spawnHouse() {
-            const h = document.getElementById('myHouse');
-            h.style.display = 'block';
-            h.style.left = `calc(50% - ${px + 150}px)`;
-            h.style.top = `calc(50% - ${py}px)`;
-            alert("House Claimed! Look to your side!");
+        function spawnCar() {
+            isInCar = true;
+            const c = document.getElementById('car');
+            c.style.display = 'block';
+            document.getElementById('player').style.opacity = "0";
+        }
+
+        function changeJob() {
+            const jobs = ["Police", "Doctor", "Chef", "Criminal"];
+            const newJob = jobs[Math.floor(Math.random()*jobs.length)];
+            document.getElementById('job-tag').innerText = "👔 Job: " + newJob;
+        }
+
+        function robBank() {
+            money += 1000;
+            alert("Bank Robbed! +$1000. Total: $" + money);
+        }
+
+        function equip(item) {
+            alert("Equipped: " + item);
         }
 
         function loop() {
@@ -85,10 +121,22 @@
             if(keys['KeyA']) px += speed;
             if(keys['KeyD']) px -= speed;
 
-            world.style.transform = `rotateX(65deg) translateY(${-400 + py}px) translateX(${px}px)`;
-            if(isInCar) {
-                car.style.transform = `translateZ(15px) rotateZ(${keys['KeyA']?-10 : keys['KeyD']?10 : 0}deg)`;
+            // Camera Logic
+            if(isFirstPerson) {
+                // First Person Camera
+                world.style.transform = `rotateX(0deg) translateY(${py}px) translateX(${px}px) translateZ(400px)`;
+            } else {
+                // Third Person Brookhaven Camera
+                world.style.transform = `rotateX(65deg) translateY(${-400 + py}px) translateX(${px}px)`;
             }
+
+            // Sync Car Position
+            if(isInCar) {
+                const car = document.getElementById('car');
+                car.style.left = `calc(50% - ${px}px)`;
+                car.style.top = `calc(50% - ${py}px)`;
+            }
+
             requestAnimationFrame(loop);
         }
         loop();
