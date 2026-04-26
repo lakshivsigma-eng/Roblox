@@ -2,151 +2,151 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Roblox Ultra: Multi-Game Engine</title>
+    <title>Brookhaven 3D - RP World</title>
     <script src="https://cloudflare.com"></script>
     <style>
-        body { margin: 0; background: #000; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        body { margin: 0; background: #87CEEB; overflow: hidden; font-family: sans-serif; }
         
-        /* UI HUD */
-        #hud { position: fixed; top: 20px; left: 20px; z-index: 10; display: flex; flex-direction: column; gap: 10px; }
-        .mode-panel { background: rgba(0,0,0,0.8); padding: 15px; border-radius: 12px; border-left: 5px solid #00A2FF; }
+        /* THE ROBLOX HUD */
+        #gui { position: fixed; inset: 0; pointer-events: none; }
         
-        .btn { background: #00A2FF; border: none; padding: 10px 15px; color: white; border-radius: 5px; cursor: pointer; font-weight: bold; margin: 5px 0; width: 100%; transition: 0.2s; }
-        .btn:hover { background: #0080CC; transform: scale(1.05); }
-        .btn.murder { background: #FF4444; }
-        .btn.murder:hover { background: #CC0000; }
+        #top-bar { position: absolute; top: 10px; left: 10px; display: flex; gap: 10px; pointer-events: auto; }
+        .icon-btn { width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
 
-        #game-label { position: fixed; top: 20px; right: 20px; font-size: 24px; font-weight: 900; color: #00A2FF; text-transform: uppercase; letter-spacing: 2px; }
-        #inventory { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; }
-        .slot { width: 50px; height: 50px; border: 2px solid #555; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-        
-        canvas { display: block; }
+        #inventory { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 12px; pointer-events: auto; }
+        .slot { width: 55px; height: 55px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; cursor: pointer; transition: 0.2s; }
+        .slot:hover { background: rgba(255,255,255,0.3); border-color: #00A2FF; }
+        .slot.active { background: #00A2FF; border-color: white; }
+
+        #status-msg { position: absolute; top: 20%; left: 50%; transform: translateX(-50%); color: white; font-weight: bold; font-size: 24px; text-shadow: 2px 2px 5px black; opacity: 0; transition: 0.5s; }
     </style>
 </head>
 <body>
 
-    <div id="game-label">RP MODE</div>
-
-    <div id="hud">
-        <div class="mode-panel">
-            <div style="font-size: 12px; margin-bottom: 10px; color: #888;">SELECT GAME MODE</div>
-            <button class="btn" onclick="setMode('RP')">🏘️ BROOKHAVEN RP</button>
-            <button class="btn murder" onclick="setMode('MM2')">🔪 MURDER MYSTERY 2</button>
-        </div>
-        
-        <div class="mode-panel" id="rp-tools">
-            <button class="btn" onclick="spawnObject('car')">🚗 SPAWN CAR</button>
-            <button class="btn" onclick="spawnObject('house')">🏠 BUILD HOUSE</button>
+    <div id="gui">
+        <div id="top-bar">
+            <div class="icon-btn">🏠</div>
+            <div class="icon-btn">🚗</div>
+            <div class="icon-btn">👤</div>
         </div>
 
-        <div class="mode-panel" id="mm2-tools" style="display:none;">
-            <button class="btn murder" onclick="spawnObject('knife')">🔪 EQUIP KNIFE</button>
-            <button class="btn murder" onclick="spawnObject('gun')">🔫 EQUIP REVOLVER</button>
-        </div>
-    </div>
+        <div id="status-msg">HOUSE UNLOCKED</div>
 
-    <div id="inventory">
-        <div class="slot" id="s1">📱</div>
-        <div class="slot" id="s2">🍕</div>
-        <div class="slot" id="s3">🛠️</div>
+        <div id="inventory">
+            <div class="slot" onclick="select(this, '🍕')">🍕</div>
+            <div class="slot" onclick="select(this, '📱')">📱</div>
+            <div class="slot active" onclick="select(this, '🛠️')">🛠️</div>
+            <div class="slot" onclick="select(this, '🚗')">🚗</div>
+            <div class="slot" onclick="select(this, '🏠')">🏠</div>
+        </div>
     </div>
 
     <script>
-        // --- 1. ENGINE INITIALIZATION ---
+        // --- 1. 3D WORLD SETUP ---
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0a0a0a);
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        scene.background = new THREE.Color(0x87CEEB); // Sky Blue
+        scene.fog = new THREE.Fog(0x87CEEB, 20, 80);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMap.enabled = true;
         document.body.appendChild(renderer.domElement);
 
-        // Lights
-        const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(10, 20, 10);
+        // Lighting
+        const light = new THREE.DirectionalLight(0xffffff, 1.2);
+        light.position.set(20, 40, 20);
         light.castShadow = true;
         scene.add(light);
-        scene.add(new THREE.AmbientLight(0x404040, 2));
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
-        // --- 2. MAP ELEMENTS ---
-        const grid = new THREE.GridHelper(200, 40, 0x00A2FF, 0x222222);
-        scene.add(grid);
-        
-        const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({color: 0x111111}));
-        floor.rotation.x = -Math.PI/2;
-        floor.receiveShadow = true;
-        scene.add(floor);
+        // --- 2. THE MAP (Brookhaven Street) ---
+        // Grass
+        const grass = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({color: 0x567d46}));
+        grass.rotation.x = -Math.PI/2;
+        grass.receiveShadow = true;
+        scene.add(grass);
 
-        // --- 3. PLAYER ---
+        // Road
+        const road = new THREE.Mesh(new THREE.PlaneGeometry(15, 200), new THREE.MeshStandardMaterial({color: 0x333333}));
+        road.rotation.x = -Math.PI/2;
+        road.position.y = 0.01;
+        scene.add(road);
+
+        // House
+        function createHouse(x, z) {
+            const house = new THREE.Group();
+            // Walls
+            const walls = new THREE.Mesh(new THREE.BoxGeometry(10, 6, 8), new THREE.MeshStandardMaterial({color: 0xffffff}));
+            walls.position.y = 3;
+            house.add(walls);
+            // Roof
+            const roof = new THREE.Mesh(new THREE.ConeGeometry(7, 4, 4), new THREE.MeshStandardMaterial({color: 0x333333}));
+            roof.position.y = 7.5;
+            roof.rotation.y = Math.PI/4;
+            house.add(roof);
+            // Door
+            const door = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 3), new THREE.MeshStandardMaterial({color: 0x4a2c1d}));
+            door.position.set(0, 1.5, 4.01);
+            house.add(door);
+            
+            house.position.set(x, 0, z);
+            scene.add(house);
+        }
+        createHouse(-15, -10); // Neighbor's house
+        createHouse(15, -30);  // Your house
+
+        // Street Lights
+        function createLight(z) {
+            const pole = new THREE.Mesh(new THREE.BoxGeometry(0.3, 10, 0.3), new THREE.MeshStandardMaterial({color: 0x444444}));
+            pole.position.set(8, 5, z);
+            scene.add(pole);
+            const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.5), new THREE.MeshStandardMaterial({emissive: 0xffff00}));
+            lamp.position.set(8, 10, z);
+            scene.add(lamp);
+        }
+        createLight(-20);
+        createLight(20);
+
+        // --- 3. THE PLAYER ---
         const player = new THREE.Group();
-        const body = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial({color: 0xffffff}));
-        body.position.y = 1;
-        player.add(body);
+        const avatar = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.5, 1.2), new THREE.MeshStandardMaterial({color: 0x222222}));
+        avatar.position.y = 1.25;
+        player.add(avatar);
         scene.add(player);
 
-        // --- 4. GAME MODES & SPAWNING ---
-        let currentMode = 'RP';
-        let objects = [];
-
-        window.setMode = function(mode) {
-            currentMode = mode;
-            document.getElementById('game-label').innerText = mode + " MODE";
-            document.getElementById('game-label').style.color = mode === 'MM2' ? '#FF4444' : '#00A2FF';
-            
-            document.getElementById('rp-tools').style.display = mode === 'RP' ? 'block' : 'none';
-            document.getElementById('mm2-tools').style.display = mode === 'MM2' ? 'block' : 'none';
-            
-            // Change World Atmosphere
-            scene.background = new THREE.Color(mode === 'MM2' ? 0x1a0000 : 0x0a0a0a);
+        // --- 4. INTERACTION & CONTROLS ---
+        function select(el, item) {
+            document.querySelectorAll('.slot').forEach(s => s.classList.remove('active'));
+            el.classList.add('active');
+            const msg = document.getElementById('status-msg');
+            msg.innerText = "EQUIPPED: " + item;
+            msg.style.opacity = '1';
+            setTimeout(() => msg.style.opacity = '0', 1500);
         }
 
-        window.spawnObject = function(type) {
-            let mesh;
-            if(type === 'car') {
-                mesh = new THREE.Mesh(new THREE.BoxGeometry(4, 1.5, 2.5), new THREE.MeshStandardMaterial({color: 0xff0000}));
-                document.getElementById('s3').innerText = "🚗";
-            } else if(type === 'house') {
-                mesh = new THREE.Mesh(new THREE.BoxGeometry(8, 8, 8), new THREE.MeshStandardMaterial({color: 0x8B4513}));
-                mesh.position.y = 4;
-            } else if(type === 'knife') {
-                mesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1, 0.1), new THREE.MeshStandardMaterial({color: 0xcccccc}));
-                document.getElementById('s3').innerText = "🔪";
-            } else if(type === 'gun') {
-                mesh = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.6, 1.2), new THREE.MeshStandardMaterial({color: 0x333333}));
-                document.getElementById('s3').innerText = "🔫";
-            }
-            
-            if(mesh) {
-                mesh.position.set(player.position.x + 5, mesh.position.y || 1, player.position.z);
-                scene.add(mesh);
-                objects.push(mesh);
-            }
-        }
-
-        // --- 5. CONTROLS & ANIMATION ---
         const keys = {};
         window.addEventListener('keydown', e => keys[e.code] = true);
         window.addEventListener('keyup', e => keys[e.code] = false);
 
-        function animate() {
-            requestAnimationFrame(animate);
-            
-            const speed = 0.2;
-            if (keys['KeyW']) player.position.z -= speed;
-            if (keys['KeyS']) player.position.z += speed;
-            if (keys['KeyA']) player.position.x -= speed;
-            if (keys['KeyD']) player.position.x += speed;
+        function update() {
+            requestAnimationFrame(update);
+            const moveSpeed = 0.2;
+            if (keys['KeyW']) player.position.z -= moveSpeed;
+            if (keys['KeyS']) player.position.z += moveSpeed;
+            if (keys['KeyA']) player.position.x -= moveSpeed;
+            if (keys['KeyD']) player.position.x += moveSpeed;
 
-            // Smooth Camera Follow
-            camera.position.lerp(new THREE.Vector3(player.position.x, player.position.y + 12, player.position.z + 18), 0.1);
+            // Camera follow
+            camera.position.set(player.position.x, player.position.y + 12, player.position.z + 18);
             camera.lookAt(player.position);
-            
+
             renderer.render(scene, camera);
         }
-        animate();
+        update();
 
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth/window.innerHeight;
+            camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
