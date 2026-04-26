@@ -2,67 +2,153 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Roblox Pro Launcher</title>
+    <title>Roblox Ultra: Multi-Game Engine</title>
+    <script src="https://cloudflare.com"></script>
     <style>
-        body { margin: 0; background: #191B1D; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        .navbar { background: #232527; padding: 15px 30px; display: flex; align-items: center; border-bottom: 1px solid #333; }
-        .logo { font-weight: 800; font-size: 24px; color: white; text-decoration: none; margin-right: 30px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; padding: 40px; }
-        .card { background: #232527; border-radius: 12px; overflow: hidden; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid #333; }
-        .card:hover { transform: scale(1.05); border-color: #00A2FF; box-shadow: 0 10px 30px rgba(0,162,255,0.2); }
-        .thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
-        .info { padding: 15px; }
+        body { margin: 0; background: #000; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
-        /* REAL LAUNCHER OVERLAY */
-        #launcher { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
-        .loader-bar { width: 300px; height: 6px; background: #333; border-radius: 3px; margin: 25px; overflow: hidden; }
-        .progress { width: 0%; height: 100%; background: #00A2FF; animation: load 3.5s forwards; }
-        @keyframes load { 0% { width: 0%; } 50% { width: 70%; } 100% { width: 100%; } }
-        .launch-icon { width: 100px; margin-bottom: 20px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+        /* UI HUD */
+        #hud { position: fixed; top: 20px; left: 20px; z-index: 10; display: flex; flex-direction: column; gap: 10px; }
+        .mode-panel { background: rgba(0,0,0,0.8); padding: 15px; border-radius: 12px; border-left: 5px solid #00A2FF; }
+        
+        .btn { background: #00A2FF; border: none; padding: 10px 15px; color: white; border-radius: 5px; cursor: pointer; font-weight: bold; margin: 5px 0; width: 100%; transition: 0.2s; }
+        .btn:hover { background: #0080CC; transform: scale(1.05); }
+        .btn.murder { background: #FF4444; }
+        .btn.murder:hover { background: #CC0000; }
+
+        #game-label { position: fixed; top: 20px; right: 20px; font-size: 24px; font-weight: 900; color: #00A2FF; text-transform: uppercase; letter-spacing: 2px; }
+        #inventory { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; }
+        .slot { width: 50px; height: 50px; border: 2px solid #555; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        
+        canvas { display: block; }
     </style>
 </head>
 <body>
-    <!-- This screen pops up when you click a game -->
-    <div id="launcher">
-        <img src="https://wikimedia.org" class="launch-icon" style="filter: invert(1);">
-        <h1 id="launchTitle" style="font-size: 28px;">Starting Roblox...</h1>
-        <div class="loader-bar"><div class="progress"></div></div>
-        <p id="status" style="color: #00A2FF; font-weight: bold; letter-spacing: 1px;">AUTHENTICATING...</p>
-        <p style="color: #888; font-size: 14px;">Please make sure the Roblox App is installed.</p>
+
+    <div id="game-label">RP MODE</div>
+
+    <div id="hud">
+        <div class="mode-panel">
+            <div style="font-size: 12px; margin-bottom: 10px; color: #888;">SELECT GAME MODE</div>
+            <button class="btn" onclick="setMode('RP')">🏘️ BROOKHAVEN RP</button>
+            <button class="btn murder" onclick="setMode('MM2')">🔪 MURDER MYSTERY 2</button>
+        </div>
+        
+        <div class="mode-panel" id="rp-tools">
+            <button class="btn" onclick="spawnObject('car')">🚗 SPAWN CAR</button>
+            <button class="btn" onclick="spawnObject('house')">🏠 BUILD HOUSE</button>
+        </div>
+
+        <div class="mode-panel" id="mm2-tools" style="display:none;">
+            <button class="btn murder" onclick="spawnObject('knife')">🔪 EQUIP KNIFE</button>
+            <button class="btn murder" onclick="spawnObject('gun')">🔫 EQUIP REVOLVER</button>
+        </div>
     </div>
 
-    <nav class="navbar"><a href="#" class="logo">ROBLOX</a></nav>
-    <div class="grid" id="gameGrid"></div>
+    <div id="inventory">
+        <div class="slot" id="s1">📱</div>
+        <div class="slot" id="s2">🍕</div>
+        <div class="slot" id="s3">🛠️</div>
+    </div>
 
     <script>
-        const games = [
-            { t: "Blox Fruits", i: "https://unsplash.com", url: "https://roblox.com" },
-            { t: "Brookhaven 🏡RP", i: "https://unsplash.com", url: "https://roblox.com" },
-            { t: "Adopt Me!", i: "https://unsplash.com", url: "https://roblox.com" },
-            { t: "Pet Simulator 99", i: "https://unsplash.com", url: "https://roblox.com" },
-            { t: "Arsenal", i: "https://unsplash.com", url: "https://roblox.com" }
-        ];
+        // --- 1. ENGINE INITIALIZATION ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0a0a);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        document.body.appendChild(renderer.domElement);
 
-        const container = document.getElementById('gameGrid');
-        games.forEach(g => {
-            const div = document.createElement('div');
-            div.className = 'card';
-            div.onclick = () => {
-                const l = document.getElementById('launcher');
-                l.style.display = 'flex';
-                document.getElementById('launchTitle').innerText = "Joining " + g.t;
-                
-                // Simulated status updates for realism
-                setTimeout(() => document.getElementById('status').innerText = "CONNECTING TO SERVER...", 1000);
-                setTimeout(() => document.getElementById('status').innerText = "LOADING ASSETS...", 2000);
-                
-                setTimeout(() => {
-                    window.location.href = g.url; // Opens the REAL Roblox game
-                }, 3800);
-            };
-            div.innerHTML = `<img src="${g.i}" class="thumb"><div class="info"><b>${g.t}</b></div>`;
-            container.appendChild(div);
+        // Lights
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(10, 20, 10);
+        light.castShadow = true;
+        scene.add(light);
+        scene.add(new THREE.AmbientLight(0x404040, 2));
+
+        // --- 2. MAP ELEMENTS ---
+        const grid = new THREE.GridHelper(200, 40, 0x00A2FF, 0x222222);
+        scene.add(grid);
+        
+        const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({color: 0x111111}));
+        floor.rotation.x = -Math.PI/2;
+        floor.receiveShadow = true;
+        scene.add(floor);
+
+        // --- 3. PLAYER ---
+        const player = new THREE.Group();
+        const body = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial({color: 0xffffff}));
+        body.position.y = 1;
+        player.add(body);
+        scene.add(player);
+
+        // --- 4. GAME MODES & SPAWNING ---
+        let currentMode = 'RP';
+        let objects = [];
+
+        window.setMode = function(mode) {
+            currentMode = mode;
+            document.getElementById('game-label').innerText = mode + " MODE";
+            document.getElementById('game-label').style.color = mode === 'MM2' ? '#FF4444' : '#00A2FF';
+            
+            document.getElementById('rp-tools').style.display = mode === 'RP' ? 'block' : 'none';
+            document.getElementById('mm2-tools').style.display = mode === 'MM2' ? 'block' : 'none';
+            
+            // Change World Atmosphere
+            scene.background = new THREE.Color(mode === 'MM2' ? 0x1a0000 : 0x0a0a0a);
+        }
+
+        window.spawnObject = function(type) {
+            let mesh;
+            if(type === 'car') {
+                mesh = new THREE.Mesh(new THREE.BoxGeometry(4, 1.5, 2.5), new THREE.MeshStandardMaterial({color: 0xff0000}));
+                document.getElementById('s3').innerText = "🚗";
+            } else if(type === 'house') {
+                mesh = new THREE.Mesh(new THREE.BoxGeometry(8, 8, 8), new THREE.MeshStandardMaterial({color: 0x8B4513}));
+                mesh.position.y = 4;
+            } else if(type === 'knife') {
+                mesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1, 0.1), new THREE.MeshStandardMaterial({color: 0xcccccc}));
+                document.getElementById('s3').innerText = "🔪";
+            } else if(type === 'gun') {
+                mesh = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.6, 1.2), new THREE.MeshStandardMaterial({color: 0x333333}));
+                document.getElementById('s3').innerText = "🔫";
+            }
+            
+            if(mesh) {
+                mesh.position.set(player.position.x + 5, mesh.position.y || 1, player.position.z);
+                scene.add(mesh);
+                objects.push(mesh);
+            }
+        }
+
+        // --- 5. CONTROLS & ANIMATION ---
+        const keys = {};
+        window.addEventListener('keydown', e => keys[e.code] = true);
+        window.addEventListener('keyup', e => keys[e.code] = false);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const speed = 0.2;
+            if (keys['KeyW']) player.position.z -= speed;
+            if (keys['KeyS']) player.position.z += speed;
+            if (keys['KeyA']) player.position.x -= speed;
+            if (keys['KeyD']) player.position.x += speed;
+
+            // Smooth Camera Follow
+            camera.position.lerp(new THREE.Vector3(player.position.x, player.position.y + 12, player.position.z + 18), 0.1);
+            camera.lookAt(player.position);
+            
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth/window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         });
     </script>
 </body>
