@@ -2,37 +2,46 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discover - Roblox</title>
-    <link rel="stylesheet" href="global.css">
-    <script src="https://unpkg.com"></script>
+    <title>Roblox Pro Launcher</title>
     <style>
-        body { margin: 0; background-color: #191B1D; color: white; font-family: sans-serif; }
+        body { margin: 0; background: #191B1D; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         .navbar { background: #232527; padding: 15px 30px; display: flex; align-items: center; border-bottom: 1px solid #333; }
-        .logo { font-weight: bold; font-size: 24px; color: white; text-decoration: none; margin-right: 30px; }
-        .discover-title { padding: 40px 30px 10px; font-size: 32px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; padding: 30px; }
-        .card { background: #232527; border-radius: 8px; overflow: hidden; cursor: pointer; transition: 0.2s; }
-        .card:hover { transform: translateY(-5px); background: #2E3032; }
+        .logo { font-weight: 800; font-size: 24px; color: white; text-decoration: none; margin-right: 30px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; padding: 40px; }
+        .card { background: #232527; border-radius: 12px; overflow: hidden; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid #333; }
+        .card:hover { transform: scale(1.05); border-color: #00A2FF; box-shadow: 0 10px 30px rgba(0,162,255,0.2); }
         .thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
         .info { padding: 15px; }
-        .game-name { font-weight: 600; margin-bottom: 8px; }
-        .stats { display: flex; gap: 15px; font-size: 13px; color: #B8B8B8; }
+        
+        /* REAL LAUNCHER OVERLAY */
+        #launcher { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
+        .loader-bar { width: 300px; height: 6px; background: #333; border-radius: 3px; margin: 25px; overflow: hidden; }
+        .progress { width: 0%; height: 100%; background: #00A2FF; animation: load 3.5s forwards; }
+        @keyframes load { 0% { width: 0%; } 50% { width: 70%; } 100% { width: 100%; } }
+        .launch-icon { width: 100px; margin-bottom: 20px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body>
+    <!-- This screen pops up when you click a game -->
+    <div id="launcher">
+        <img src="https://wikimedia.org" class="launch-icon" style="filter: invert(1);">
+        <h1 id="launchTitle" style="font-size: 28px;">Starting Roblox...</h1>
+        <div class="loader-bar"><div class="progress"></div></div>
+        <p id="status" style="color: #00A2FF; font-weight: bold; letter-spacing: 1px;">AUTHENTICATING...</p>
+        <p style="color: #888; font-size: 14px;">Please make sure the Roblox App is installed.</p>
+    </div>
+
     <nav class="navbar"><a href="#" class="logo">ROBLOX</a></nav>
-    <h1 class="discover-title">Discover</h1>
     <div class="grid" id="gameGrid"></div>
 
     <script>
         const games = [
-            { t: "Blox Shooter", l: "99%", p: "10K", i: "https://unsplash.com" },
-            { t: "Galaxy Escape", l: "95%", p: "5K", i: "https://unsplash.com" },
-            { t: "Neon Runner", l: "92%", p: "12K", i: "https://unsplash.com" },
-            { t: "Void Star", l: "90%", p: "8K", i: "https://unsplash.com" },
-            { t: "Cyber Strike", l: "94%", p: "15K", i: "https://unsplash.com" },
-            { t: "Super Block", l: "91%", p: "20K", i: "https://unsplash.com" }
+            { t: "Blox Fruits", i: "https://unsplash.com", url: "https://roblox.com" },
+            { t: "Brookhaven 🏡RP", i: "https://unsplash.com", url: "https://roblox.com" },
+            { t: "Adopt Me!", i: "https://unsplash.com", url: "https://roblox.com" },
+            { t: "Pet Simulator 99", i: "https://unsplash.com", url: "https://roblox.com" },
+            { t: "Arsenal", i: "https://unsplash.com", url: "https://roblox.com" }
         ];
 
         const container = document.getElementById('gameGrid');
@@ -40,25 +49,19 @@
             const div = document.createElement('div');
             div.className = 'card';
             div.onclick = () => {
-                const ov = document.createElement('div');
-                ov.style = "position:fixed;inset:0;background:#000;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:crosshair;";
-                ov.innerHTML = `<h2 style='color:#00A2FF'>PLAYING: ${g.t}</h2><p style='color:white'>MOVE MOUSE TO SHOOT RED BLOCKS</p><canvas id='c' width='600' height='400' style='border:2px solid #444;background:#050505'></canvas><button onclick='location.reload()' style='margin-top:20px;padding:10px 20px;background:red;color:white;border:none;border-radius:5px;cursor:pointer'>EXIT</button>`;
-                document.body.appendChild(ov);
-                const cv = document.getElementById('c'), x = cv.getContext('2d');
-                let p=300, b=[], e=[];
-                cv.onmousemove = (m) => p = m.offsetX;
-                setInterval(() => e.push({x:Math.random()*580,y:0}), 800);
-                function frame() {
-                    x.clearRect(0,0,600,400); x.fillStyle='#00A2FF'; x.fillRect(p-15,370,30,10);
-                    if(Math.random()<0.1) b.push({x:p,y:370});
-                    b.forEach((v,i) => { v.y-=5; x.fillStyle='yellow'; x.fillRect(v.x,v.y,4,8); if(v.y<0) b.splice(i,1); });
-                    e.forEach((v,i) => { v.y+=2; x.fillStyle='red'; x.fillRect(v.x,v.y,20,20); 
-                        b.forEach((k,j) => { if(k.x>v.x && k.x<v.x+20 && k.y<v.y+20){ e.splice(i,1); b.splice(j,1); }});
-                    });
-                    requestAnimationFrame(frame);
-                } frame();
+                const l = document.getElementById('launcher');
+                l.style.display = 'flex';
+                document.getElementById('launchTitle').innerText = "Joining " + g.t;
+                
+                // Simulated status updates for realism
+                setTimeout(() => document.getElementById('status').innerText = "CONNECTING TO SERVER...", 1000);
+                setTimeout(() => document.getElementById('status').innerText = "LOADING ASSETS...", 2000);
+                
+                setTimeout(() => {
+                    window.location.href = g.url; // Opens the REAL Roblox game
+                }, 3800);
             };
-            div.innerHTML = `<img src="${g.i}" class="thumb"><div class="info"><div class="game-name">${g.t}</div><div class="stats"><span>👍 ${g.l}</span><span>👤 ${g.p}</span></div></div>`;
+            div.innerHTML = `<img src="${g.i}" class="thumb"><div class="info"><b>${g.t}</b></div>`;
             container.appendChild(div);
         });
     </script>
