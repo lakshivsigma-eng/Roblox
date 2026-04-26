@@ -2,86 +2,80 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Brookhaven Ultra RP</title>
+    <title>Brookhaven Ultra RP - Working Version</title>
     <style>
         body { margin: 0; background: #87CEEB; overflow: hidden; perspective: 1200px; font-family: 'Segoe UI', sans-serif; }
         #world { position: absolute; width: 100vw; height: 100vh; transform-style: preserve-3d; transform: rotateX(65deg) translateY(-400px); transition: transform 0.05s linear; }
         
-        /* THE MAP - Sidewalks & Roads */
+        /* MAP */
         .grass { position: absolute; width: 8000px; height: 8000px; background: #567d46; top: -4000px; left: -4000px; transform: translateZ(0); }
         .road { position: absolute; width: 120px; height: 8000px; background: #333; top: -4000px; left: 50%; transform: translateX(-50%) translateZ(1px); border-left: 15px solid #eee; border-right: 15px solid #eee; }
-        .hydrant { position: absolute; width: 8px; height: 15px; background: #ff0000; transform: translateZ(10px); border-radius: 5px; }
-
-        /* THE BLUE SPORTS CAR */
-        #car { display: none; position: absolute; width: 45px; height: 80px; background: #001144; border-radius: 5px; transform: translateZ(12px); border: 2px solid #000; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
-        .tail-light { position: absolute; bottom: 0; width: 10px; height: 5px; background: red; }
-        #player { position: absolute; width: 22px; height: 22px; background: #222; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(15px); border-radius: 50%; }
-
-        /* BROOKHAVEN HUD - Side & Top Menus */
-        #gui { position: fixed; inset: 0; pointer-events: none; z-index: 1000; }
-        .top-left { position: absolute; top: 20px; left: 20px; display: flex; gap: 10px; pointer-events: auto; }
-        .side-menu { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; pointer-events: auto; }
-        .inventory { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 12px; pointer-events: auto; }
         
-        .btn { width: 50px; height: 50px; background: rgba(255,255,255,0.9); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; border: 2px solid #ddd; box-shadow: 0 4px 0 #bbb; }
-        .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #bbb; }
-        .btn-blue { background: #00A2FF; color: white; border: none; }
+        /* HOUSES */
+        .house { position: absolute; width: 100px; height: 80px; background: white; transform: translateZ(40px); border: 3px solid #ccc; display: none; }
+        .roof { position: absolute; width: 100px; height: 100px; background: #444; transform: translateY(-30px) rotateX(-45deg); top: -20px; }
+
+        /* CAR & PLAYER */
+        #car { display: none; position: absolute; width: 50px; height: 90px; background: #001144; border-radius: 8px; transform: translateZ(15px); border: 3px solid black; }
+        .light { position: absolute; bottom: 0; width: 12px; height: 6px; background: red; }
+        #player { position: absolute; width: 25px; height: 25px; background: #222; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(20px); border-radius: 50%; }
+
+        /* UI BUTTONS */
+        #gui { position: fixed; inset: 0; pointer-events: none; z-index: 1000; }
+        .menu { position: absolute; pointer-events: auto; display: flex; gap: 10px; }
+        .top-left { top: 20px; left: 20px; }
+        .side-right { right: 20px; top: 50%; transform: translateY(-50%); flex-direction: column; }
+        
+        .btn { width: 55px; height: 55px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; border: 3px solid #ddd; box-shadow: 0 5px 0 #bbb; }
+        .btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #bbb; }
     </style>
 </head>
 <body>
 
     <div id="gui">
-        <div class="top-left">
-            <div class="btn">🏠</div>
-            <div class="btn">🎒</div>
+        <div class="menu top-left">
+            <div class="btn" onclick="spawnHouse()">🏠</div>
         </div>
-
-        <div class="side-menu">
-            <div class="btn">👤</div>
+        <div class="menu side-right">
             <div class="btn" onclick="spawnCar()">🚗</div>
-            <div class="btn">👗</div>
-            <div class="btn">🔧</div>
-        </div>
-
-        <div class="inventory">
-            <div class="btn">🍕</div>
-            <div class="btn">📱</div>
-            <div class="btn">🛠️</div>
-            <div class="btn btn-blue" onclick="location.reload()">🔄</div>
+            <div class="btn" onclick="location.reload()">🔄</div>
         </div>
     </div>
 
     <div id="world">
         <div class="grass"></div>
         <div class="road"></div>
-        
-        <!-- Street Decorations -->
-        <div class="hydrant" style="left: calc(50% + 70px); top: 48%;"></div>
-        <div class="hydrant" style="left: calc(50% - 78px); top: 40%;"></div>
-
-        <div id="car">
-            <div class="tail-light" style="left: 5px;"></div>
-            <div class="tail-light" style="right: 5px;"></div>
-        </div>
+        <div class="house" id="myHouse"><div class="roof"></div></div>
+        <div id="car"><div class="light" style="left:5px"></div><div class="light" style="right:5px"></div></div>
         <div id="player"></div>
     </div>
 
     <script>
-        let px = 0; let py = 0;
-        let isInCar = false;
+        let px = 0, py = 0, isInCar = false;
         const world = document.getElementById('world');
+        const player = document.getElementById('player');
         const car = document.getElementById('car');
         const keys = {};
 
         window.onkeydown = (e) => keys[e.code] = true;
         window.onkeyup = (e) => keys[e.code] = false;
 
+        // --- BUTTON ACTIONS ---
         function spawnCar() {
-            car.style.display = 'block';
-            car.style.left = `calc(50% - ${px + 22}px)`;
-            car.style.top = `calc(50% - ${py}px)`;
             isInCar = true;
-            document.getElementById('player').style.opacity = '0';
+            car.style.display = 'block';
+            player.style.opacity = '0';
+            // Put car where player is
+            car.style.left = `calc(50% - ${px + 25}px)`;
+            car.style.top = `calc(50% - ${py}px)`;
+        }
+
+        function spawnHouse() {
+            const h = document.getElementById('myHouse');
+            h.style.display = 'block';
+            h.style.left = `calc(50% - ${px + 150}px)`;
+            h.style.top = `calc(50% - ${py}px)`;
+            alert("House Claimed! Look to your side!");
         }
 
         function loop() {
@@ -92,12 +86,9 @@
             if(keys['KeyD']) px -= speed;
 
             world.style.transform = `rotateX(65deg) translateY(${-400 + py}px) translateX(${px}px)`;
-            
             if(isInCar) {
-                // Car tilt animation
-                car.style.transform = `translateZ(12px) rotateZ(${keys['KeyA'] ? -8 : keys['KeyD'] ? 8 : 0}deg)`;
+                car.style.transform = `translateZ(15px) rotateZ(${keys['KeyA']?-10 : keys['KeyD']?10 : 0}deg)`;
             }
-
             requestAnimationFrame(loop);
         }
         loop();
