@@ -2,103 +2,85 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Brookhaven 3D - Fixed Map</title>
-    <!-- 1. The 3D Engine must load first -->
-    <script src="https://cloudflare.com"></script>
+    <title>Brookhaven 3D - Ultra Stable</title>
     <style>
-        body { margin: 0; background: #87CEEB; overflow: hidden; font-family: sans-serif; }
+        /* This builds a 3D world without needing outside libraries */
+        body { margin: 0; background: #87CEEB; overflow: hidden; perspective: 1000px; font-family: sans-serif; }
+        
+        #world { 
+            position: absolute; width: 100vw; height: 100vh;
+            transform-style: preserve-3d;
+            transform: rotateX(60deg) translateY(-200px);
+            transition: transform 0.1s;
+        }
+
+        /* THE MAP */
+        .grass {
+            position: absolute; width: 5000px; height: 5000px;
+            background: #567d46; top: -2500px; left: -2500px;
+            transform: translateZ(0);
+        }
+
+        .road {
+            position: absolute; width: 60px; height: 5000px;
+            background: #333; top: -2500px; left: 50%;
+            transform: translateX(-50%) translateZ(1px);
+            border-left: 2px dashed white; border-right: 2px dashed white;
+        }
+
+        /* THE PLAYER */
+        #player {
+            position: absolute; width: 20px; height: 20px;
+            background: #00A2FF; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) translateZ(10px);
+            box-shadow: 0 0 20px #00A2FF;
+        }
+
+        /* UI */
         #gui { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
         #inventory { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; background: rgba(0,0,0,0.6); padding: 12px; border-radius: 15px; pointer-events: auto; }
-        .slot { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; }
-        .slot.active { background: #00A2FF; border-color: white; box-shadow: 0 0 15px #00A2FF; }
-        #msg { position: absolute; top: 10px; left: 10px; color: white; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 5px; }
+        .slot { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+        .slot.active { background: #00A2FF; border-color: white; }
     </style>
 </head>
 <body>
 
     <div id="gui">
-        <div id="msg">WASD to Walk | If screen is blue, wait 5 seconds...</div>
         <div id="inventory">
             <div class="slot">🍕</div>
             <div class="slot">📱</div>
             <div class="slot active">🛠️</div>
             <div class="slot">🚗</div>
-            <div class="slot" onclick="alert('House Claimed!')">🏠</div>
+            <div class="slot">🏠</div>
         </div>
     </div>
 
+    <div id="world">
+        <div class="grass"></div>
+        <div class="road"></div>
+        <div id="player"></div>
+    </div>
+
     <script>
-        // 2. Setup the Scene
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x87CEEB);
-
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        // 3. Lighting
-        const light = new THREE.DirectionalLight(0xffffff, 1.2);
-        light.position.set(10, 50, 10);
-        scene.add(light);
-        scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-
-        // 4. THE MAP (Giant Floor)
-        const floorGeo = new THREE.PlaneGeometry(2000, 2000);
-        const floorMat = new THREE.MeshStandardMaterial({ color: 0x567d46 }); // Green
-        const floor = new THREE.Mesh(floorGeo, floorMat);
-        floor.rotation.x = -Math.PI / 2;
-        scene.add(floor);
-
-        // THE ROAD
-        const roadGeo = new THREE.PlaneGeometry(25, 2000);
-        const roadMat = new THREE.MeshStandardMaterial({ color: 0x333333 }); // Dark Grey
-        const road = new THREE.Mesh(roadGeo, roadMat);
-        road.rotation.x = -Math.PI / 2;
-        road.position.y = 0.1;
-        scene.add(road);
-
-        // 5. THE PLAYER (Blue Avatar)
-        const player = new THREE.Mesh(
-            new THREE.BoxGeometry(2, 4, 2),
-            new THREE.MeshStandardMaterial({ color: 0x00A2FF })
-        );
-        player.position.set(0, 2, 0);
-        scene.add(player);
-
-        // 6. POSITION CAMERA (Looking down at the road)
-        camera.position.set(0, 30, 50);
-        camera.lookAt(0, 0, 0);
-
-        // 7. CONTROLS
+        let x = 0; let y = 0;
+        const world = document.getElementById('world');
         const keys = {};
+
         window.onkeydown = (e) => keys[e.code] = true;
         window.onkeyup = (e) => keys[e.code] = false;
 
-        function animate() {
-            requestAnimationFrame(animate);
+        function loop() {
+            if(keys['KeyW']) y += 5;
+            if(keys['KeyS']) y -= 5;
+            if(keys['KeyA']) x += 5;
+            if(keys['KeyD']) x -= 5;
+
+            // Move the world, not the player (like a real camera)
+            world.style.transform = `rotateX(60deg) translateY(${-200 + y}px) translateX(${x}px)`;
             
-            const speed = 0.4;
-            if(keys['KeyW']) player.position.z -= speed;
-            if(keys['KeyS']) player.position.z += speed;
-            if(keys['KeyA']) player.position.x -= speed;
-            if(keys['KeyD']) player.position.x += speed;
-
-            // Camera follows player exactly
-            camera.position.set(player.position.x, 30, player.position.z + 50);
-            camera.lookAt(player.position.x, 0, player.position.z);
-
-            renderer.render(scene, camera);
+            requestAnimationFrame(loop);
         }
-        
-        // Final check to make sure things show up
-        animate();
-
-        window.onresize = () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        };
+        loop();
     </script>
 </body>
 </html>
