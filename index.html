@@ -5,578 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discover - Roblox</title>
     <link rel="stylesheet" href="global.css">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com"></script>
     <style>
-        /* Page-specific styles for Discover */
-        .discover-page {
-            min-height: 100vh;
-            padding-bottom: 60px;
-        }
-
-        .discover-hero {
-            background: linear-gradient(135deg, #1a1d23 0%, #232527 100%);
-            padding: 40px 24px 24px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .discover-hero-content {
-            max-width: 1920px;
-            margin: 0 auto;
-        }
-
-        .discover-title {
-            font-size: 2.5rem;
-            font-weight: var(--font-weight-bold);
-            margin-bottom: 12px;
-            background: linear-gradient(135deg, #FFFFFF 0%, #B8B8B8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .discover-subtitle {
-            font-size: 1.125rem;
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-        }
-
-        .discover-filters {
-            display: flex;
-            gap: var(--spacing-sm);
-            flex-wrap: wrap;
-        }
-
-        .filter-chip {
-            padding: 8px 16px;
-            background-color: var(--bg-tertiary);
-            border: 1px solid transparent;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: var(--font-weight-medium);
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .filter-chip:hover {
-            background-color: var(--bg-hover);
-            color: var(--text-primary);
-        }
-
-        .filter-chip.active {
-            background-color: var(--roblox-blue);
-            color: var(--text-primary);
-            border-color: var(--roblox-blue);
-        }
-
-        /* 15-Game Grid Container */
-        .discover-grid {
-            max-width: 1920px;
-            margin: 0 auto;
-            padding: 32px 24px;
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 20px;
-        }
-
-        /* Enhanced game card for discover page */
-        .discover-game-card {
-            background-color: var(--bg-secondary);
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .discover-game-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: var(--radius-md);
-            padding: 1px;
-            background: linear-gradient(135deg, rgba(0, 162, 255, 0.3), transparent);
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .discover-game-card:hover::before {
-            opacity: 1;
-        }
-
-        .discover-game-card:hover {
-            transform: translateY(-6px) scale(1.02);
-            box-shadow: 0 12px 32px rgba(0, 162, 255, 0.15);
-        }
-
-        .discover-game-card:active {
-            transform: translateY(-2px) scale(1.01);
-        }
-
-        /* Thumbnail with play button overlay */
-        .discover-thumbnail {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background-color: var(--bg-tertiary);
-            overflow: hidden;
-        }
-
-        .discover-thumbnail img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .discover-game-card:hover .discover-thumbnail img {
-            transform: scale(1.1);
-        }
-
-        .play-overlay {
-            position: absolute;
-            inset: 0;
-            background: var(--overlay-dark);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .discover-game-card:hover .play-overlay {
-            opacity: 1;
-        }
-
-        .play-button {
-            width: 56px;
-            height: 56px;
-            background-color: var(--roblox-blue);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transform: scale(0.8);
-            transition: all 0.3s ease;
-        }
-
-        .discover-game-card:hover .play-button {
-            transform: scale(1);
-        }
-
-        .play-button svg {
-            margin-left: 3px;
-        }
-
-        /* Game card content */
-        .discover-game-content {
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            flex: 1;
-        }
-
-        .discover-game-title {
-            font-size: 1rem;
-            font-weight: var(--font-weight-semibold);
-            color: var(--text-primary);
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            min-height: 2.8em;
-        }
-
-        .discover-game-stats {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: var(--spacing-md);
-            margin-top: auto;
-        }
-
-        .stat-group {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-        }
-
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.8125rem;
-            color: var(--text-secondary);
-            font-weight: var(--font-weight-medium);
-        }
-
-        .stat-item svg {
-            width: 14px;
-            height: 14px;
-        }
-
-        .like-percentage {
-            color: var(--green-positive);
-        }
-
-        .like-percentage svg {
-            color: var(--green-positive);
-        }
-
-        .player-count {
-            color: var(--text-secondary);
-        }
-
-        .player-count svg {
-            color: var(--text-tertiary);
-        }
-
-        /* Responsive grid */
-        @media (max-width: 1600px) {
-            .discover-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-
-        @media (max-width: 1200px) {
-            .discover-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .discover-grid {
-                grid-template-columns: repeat(2, 1fr);
-                padding: 24px 16px;
-                gap: 16px;
-            }
-
-            .discover-hero {
-                padding: 24px 16px 16px;
-            }
-
-            .discover-title {
-                font-size: 2rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .discover-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Loading state */
-        .game-card-loading {
-            opacity: 0.6;
-            pointer-events: none;
-        }
-
-        /* Empty state */
-        .discover-empty {
-            text-align: center;
-            padding: 80px 24px;
-        }
-
-        .discover-empty h3 {
-            color: var(--text-secondary);
-            font-size: 1.5rem;
-            margin-bottom: 8px;
-        }
-
-        .discover-empty p {
-            color: var(--text-tertiary);
-        }
+        body { margin: 0; background-color: #191B1D; color: white; font-family: sans-serif; }
+        .navbar { background: #232527; padding: 15px 30px; display: flex; align-items: center; border-bottom: 1px solid #333; }
+        .logo { font-weight: bold; font-size: 24px; color: white; text-decoration: none; margin-right: 30px; }
+        .discover-title { padding: 40px 30px 10px; font-size: 32px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; padding: 30px; }
+        .card { background: #232527; border-radius: 8px; overflow: hidden; cursor: pointer; transition: 0.2s; }
+        .card:hover { transform: translateY(-5px); background: #2E3032; }
+        .thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+        .info { padding: 15px; }
+        .game-name { font-weight: 600; margin-bottom: 8px; }
+        .stats { display: flex; gap: 15px; font-size: 13px; color: #B8B8B8; }
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="navbar-container">
-            <a href="index.html" class="navbar-logo">
-                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="32" height="32" rx="8" fill="#00A2FF"/>
-                    <path d="M8 8H14V14H8V8Z" fill="white"/>
-                    <path d="M18 8H24V14H18V8Z" fill="white"/>
-                    <path d="M8 18H14V24H8V18Z" fill="white"/>
-                    <path d="M18 18H24V24H18V18Z" fill="white"/>
-                </svg>
-                <span>Roblox</span>
-            </a>
-
-            <ul class="navbar-nav">
-                <li><a href="index.html" class="nav-link">
-                    <i data-lucide="home" style="width: 18px; height: 18px;"></i>
-                    Home
-                </a></li>
-                <li><a href="Discover.html" class="nav-link active">
-                    <i data-lucide="compass" style="width: 18px; height: 18px;"></i>
-                    Discover
-                </a></li>
-                <li><a href="#" class="nav-link">
-                    <i data-lucide="store" style="width: 18px; height: 18px;"></i>
-                    Marketplace
-                </a></li>
-                <li><a href="#" class="nav-link">
-                    <i data-lucide="trophy" style="width: 18px; height: 18px;"></i>
-                    Leaderboards
-                </a></li>
-            </ul>
-
-            <div class="navbar-search">
-                <i data-lucide="search" class="search-icon" style="width: 18px; height: 18px;"></i>
-                <input type="text" class="search-input" placeholder="Search games, creators...">
-            </div>
-
-            <div class="navbar-actions">
-                <button class="navbar-icon-btn">
-                    <i data-lucide="coins" style="width: 20px; height: 20px; color: #FFB800;"></i>
-                </button>
-                <button class="navbar-icon-btn">
-                    <i data-lucide="bell" style="width: 20px; height: 20px;"></i>
-                    <span class="navbar-badge"></span>
-                </button>
-                <button class="navbar-icon-btn">
-                    <i data-lucide="user" style="width: 20px; height: 20px;"></i>
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Discover Page -->
-    <main class="discover-page">
-        <!-- Hero Section -->
-        <section class="discover-hero">
-            <div class="discover-hero-content">
-                <h1 class="discover-title">Discover Games</h1>
-                <p class="discover-subtitle">Explore thousands of immersive experiences created by our community</p>
-                
-                <div class="discover-filters">
-                    <button class="filter-chip active">All Games</button>
-                    <button class="filter-chip">Popular</button>
-                    <button class="filter-chip">Featured</button>
-                    <button class="filter-chip">Adventure</button>
-                    <button class="filter-chip">Shooter</button>
-                    <button class="filter-chip">RPG</button>
-                    <button class="filter-chip">Simulation</button>
-                    <button class="filter-chip">Horror</button>
-                    <button class="filter-chip">Platformer</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- 15-Game Grid -->
-        <section class="discover-grid" id="gamesGrid">
-            <!-- Games will be populated by JavaScript -->
-        </section>
-    </main>
+    <nav class="navbar"><a href="#" class="logo">ROBLOX</a></nav>
+    <h1 class="discover-title">Discover</h1>
+    <div class="grid" id="gameGrid"></div>
 
     <script>
-        // Game data - easily customizable
         const games = [
-            {
-                title: "Brookhaven RP",
-                thumbnail: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=225&fit=crop",
-                likePercentage: 94,
-                playerCount: "487K"
-            },
-            {
-                title: "Adopt Me!",
-                thumbnail: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&h=225&fit=crop",
-                likePercentage: 91,
-                playerCount: "356K"
-            },
-            {
-                title: "Tower of Hell",
-                thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=225&fit=crop",
-                likePercentage: 88,
-                playerCount: "234K"
-            },
-            {
-                title: "Murder Mystery 2",
-                thumbnail: "https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=400&h=225&fit=crop",
-                likePercentage: 92,
-                playerCount: "198K"
-            },
-            {
-                title: "Blox Fruits",
-                thumbnail: "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=400&h=225&fit=crop",
-                likePercentage: 96,
-                playerCount: "523K"
-            },
-            {
-                title: "Jailbreak",
-                thumbnail: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=400&h=225&fit=crop",
-                likePercentage: 89,
-                playerCount: "167K"
-            },
-            {
-                title: "MeepCity",
-                thumbnail: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=400&h=225&fit=crop",
-                likePercentage: 85,
-                playerCount: "143K"
-            },
-            {
-                title: "Piggy",
-                thumbnail: "https://images.unsplash.com/photo-1616628188859-7a11abb6fcc9?w=400&h=225&fit=crop",
-                likePercentage: 93,
-                playerCount: "276K"
-            },
-            {
-                title: "Arsenal",
-                thumbnail: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=225&fit=crop",
-                likePercentage: 90,
-                playerCount: "189K"
-            },
-            {
-                title: "Pet Simulator X",
-                thumbnail: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=225&fit=crop",
-                likePercentage: 87,
-                playerCount: "412K"
-            },
-            {
-                title: "Phantom Forces",
-                thumbnail: "https://images.unsplash.com/photo-1560253023-3ec5d502959f?w=400&h=225&fit=crop",
-                likePercentage: 91,
-                playerCount: "124K"
-            },
-            {
-                title: "Royale High",
-                thumbnail: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=225&fit=crop",
-                likePercentage: 88,
-                playerCount: "156K"
-            },
-            {
-                title: "Islands",
-                thumbnail: "https://images.unsplash.com/photo-1551244072-5d12893278ab?w=400&h=225&fit=crop",
-                likePercentage: 86,
-                playerCount: "98.5K"
-            },
-            {
-                title: "Anime Fighting Simulator",
-                thumbnail: "https://images.unsplash.com/photo-1613376023733-0a73315d9b06?w=400&h=225&fit=crop",
-                likePercentage: 89,
-                playerCount: "203K"
-            },
-            {
-                title: "Natural Disaster Survival",
-                thumbnail: "https://images.unsplash.com/photo-1527482797697-8795b05a13fe?w=400&h=225&fit=crop",
-                likePercentage: 92,
-                playerCount: "134K"
-            }
+            { t: "Blox Shooter", l: "99%", p: "10K", i: "https://unsplash.com" },
+            { t: "Galaxy Escape", l: "95%", p: "5K", i: "https://unsplash.com" },
+            { t: "Neon Runner", l: "92%", p: "12K", i: "https://unsplash.com" },
+            { t: "Void Star", l: "90%", p: "8K", i: "https://unsplash.com" },
+            { t: "Cyber Strike", l: "94%", p: "15K", i: "https://unsplash.com" },
+            { t: "Super Block", l: "91%", p: "20K", i: "https://unsplash.com" }
         ];
 
-        // Function to format player count
-        function formatPlayerCount(count) {
-            return count;
-        }
-
-        // Function to create a game card
-        function createGameCard(game, index) {
-            return `
-                <article class="discover-game-card fade-in" style="animation-delay: ${index * 0.05}s">
-                    <div class="discover-thumbnail">
-                        <img src="${game.thumbnail}" alt="${game.title}" loading="lazy">
-                        <div class="play-overlay">
-                            <div class="play-button">
-                                <i data-lucide="play" style="width: 24px; height: 24px; color: white;"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="discover-game-content">
-                        <h3 class="discover-game-title">${game.title}</h3>
-                        <div class="discover-game-stats">
-                            <div class="stat-item like-percentage">
-                                <i data-lucide="thumbs-up" style="width: 14px; height: 14px;"></i>
-                                <span class="stat-value">${game.likePercentage}%</span>
-                            </div>
-                            <div class="stat-item player-count">
-                                <i data-lucide="users" style="width: 14px; height: 14px;"></i>
-                                <span class="stat-value">${formatPlayerCount(game.playerCount)}</span>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-            `;
-        }
-
-        // Populate the grid
-        function populateGamesGrid() {
-            const gridContainer = document.getElementById('gamesGrid');
-            const gameCards = games.map((game, index) => createGameCard(game, index)).join('');
-            gridContainer.innerHTML = gameCards;
-            
-            // Initialize Lucide icons after DOM update
-            lucide.createIcons();
-        }
-
-        // Filter functionality
-        function setupFilters() {
-            const filterChips = document.querySelectorAll('.filter-chip');
-            
-            filterChips.forEach(chip => {
-                chip.addEventListener('click', function() {
-                    // Remove active class from all chips
-                    filterChips.forEach(c => c.classList.remove('active'));
-                    // Add active class to clicked chip
-                    this.classList.add('active');
-                    
-                    // In a real implementation, this would filter the games
-                    console.log('Filter selected:', this.textContent);
-                });
-            });
-        }
-
-        // Game card click handler
-        function setupGameCardListeners() {
-            const gameCards = document.querySelectorAll('.discover-game-card');
-            
-            gameCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    const title = this.querySelector('.discover-game-title').textContent;
-                    console.log('Game clicked:', title);
-                    // In a real implementation, this would navigate to the game page
-                    alert(`Loading ${title}...`);
-                });
-            });
-        }
-
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            populateGamesGrid();
-            setupFilters();
-            setupGameCardListeners();
-            lucide.createIcons();
+        const container = document.getElementById('gameGrid');
+        games.forEach(g => {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.onclick = () => {
+                const ov = document.createElement('div');
+                ov.style = "position:fixed;inset:0;background:#000;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:crosshair;";
+                ov.innerHTML = `<h2 style='color:#00A2FF'>PLAYING: ${g.t}</h2><p style='color:white'>MOVE MOUSE TO SHOOT RED BLOCKS</p><canvas id='c' width='600' height='400' style='border:2px solid #444;background:#050505'></canvas><button onclick='location.reload()' style='margin-top:20px;padding:10px 20px;background:red;color:white;border:none;border-radius:5px;cursor:pointer'>EXIT</button>`;
+                document.body.appendChild(ov);
+                const cv = document.getElementById('c'), x = cv.getContext('2d');
+                let p=300, b=[], e=[];
+                cv.onmousemove = (m) => p = m.offsetX;
+                setInterval(() => e.push({x:Math.random()*580,y:0}), 800);
+                function frame() {
+                    x.clearRect(0,0,600,400); x.fillStyle='#00A2FF'; x.fillRect(p-15,370,30,10);
+                    if(Math.random()<0.1) b.push({x:p,y:370});
+                    b.forEach((v,i) => { v.y-=5; x.fillStyle='yellow'; x.fillRect(v.x,v.y,4,8); if(v.y<0) b.splice(i,1); });
+                    e.forEach((v,i) => { v.y+=2; x.fillStyle='red'; x.fillRect(v.x,v.y,20,20); 
+                        b.forEach((k,j) => { if(k.x>v.x && k.x<v.x+20 && k.y<v.y+20){ e.splice(i,1); b.splice(j,1); }});
+                    });
+                    requestAnimationFrame(frame);
+                } frame();
+            };
+            div.innerHTML = `<img src="${g.i}" class="thumb"><div class="info"><div class="game-name">${g.t}</div><div class="stats"><span>👍 ${g.l}</span><span>👤 ${g.p}</span></div></div>`;
+            container.appendChild(div);
         });
-
-        // Example: How to easily update games
-        // Just modify the 'games' array above with new data:
-        /*
-        const newGames = [
-            {
-                title: "Your New Game",
-                thumbnail: "https://your-image-url.com/image.jpg",
-                likePercentage: 95,
-                playerCount: "500K"
-            },
-            // ... add 14 more games
-        ];
-        // Then the grid will automatically update
-        */
-    </script>
-
-    <script>
-        // Initialize Lucide icons
-        lucide.createIcons();
     </script>
 </body>
 </html>
