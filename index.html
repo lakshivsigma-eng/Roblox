@@ -2,52 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Brookhaven 3D - Final Fix</title>
+    <title>Brookhaven 3D - First Person</title>
     <style>
-        /* THIS BUILDS THE MAP WITHOUT NEEDING OUTSIDE LIBRARIES */
-        body { margin: 0; background: #87CEEB; overflow: hidden; perspective: 1000px; font-family: sans-serif; }
+        body { margin: 0; background: #87CEEB; overflow: hidden; perspective: 800px; font-family: sans-serif; }
+        
+        /* FIRST PERSON VIEW */
         #world { 
             position: absolute; width: 100vw; height: 100vh;
             transform-style: preserve-3d;
-            transform: rotateX(60deg) translateY(-200px);
+            /* This angle makes it feel like First Person */
+            transform: rotateX(0deg) translateY(0px) translateZ(500px);
+            transition: transform 0.05s linear;
         }
-        .grass {
-            position: absolute; width: 4000px; height: 4000px;
-            background: #567d46; top: -2000px; left: -2000px;
-            transform: translateZ(0);
-        }
-        .road {
-            position: absolute; width: 100px; height: 4000px;
-            background: #333; top: -2000px; left: 50%;
-            transform: translateX(-50%) translateZ(1px);
-            border-left: 5px dashed white; border-right: 5px dashed white;
-        }
-        .house {
-            position: absolute; width: 100px; height: 80px; background: white;
-            left: calc(50% + 100px); top: 50%; transform: translateZ(40px);
-            border: 4px solid #444; display: flex; align-items: center; justify-content: center; font-size: 40px;
-        }
-        #player {
-            position: absolute; width: 30px; height: 30px;
-            background: #222; top: 50%; left: 50%;
-            transform: translate(-50%, -50%) translateZ(20px);
-            border-radius: 50%; box-shadow: 0 0 20px #00A2FF;
-        }
+
+        .grass { position: absolute; width: 8000px; height: 8000px; background: #567d46; top: -4000px; left: -4000px; transform: rotateX(90deg); }
+        .road { position: absolute; width: 150px; height: 8000px; background: #333; left: 50%; top: -4000px; transform: translateX(-50%) rotateX(90deg) translateZ(1px); border-left: 10px dashed white; border-right: 10px dashed white; }
+
+        .house { position: absolute; width: 150px; height: 100px; background: white; border: 4px solid #444; transform: translate3d(200px, -50px, -600px); display: flex; align-items: center; justify-content: center; font-size: 50px; }
+        
+        #player { position: absolute; width: 40px; height: 40px; background: #222; left: 50%; top: 50%; transform: translate(-50%, -50%) translateZ(0px); border-radius: 50%; opacity: 0; } /* Hidden in First Person */
+        #car { display: none; position: absolute; width: 100px; height: 180px; background: #001144; left: 50%; top: 50%; transform: translate(-50%, -50%) translateZ(-50px) rotateX(90deg); border-radius: 15px; border: 5px solid #000; }
+
         /* UI HUD */
-        #gui { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
-        .panel { position: absolute; pointer-events: auto; background: rgba(0,0,0,0.6); padding: 10px; border-radius: 15px; display: flex; gap: 10px; }
+        #gui { position: fixed; inset: 0; pointer-events: none; z-index: 1000; }
+        .panel { position: absolute; pointer-events: auto; background: rgba(0,0,0,0.6); padding: 12px; border-radius: 15px; display: flex; gap: 10px; }
         .side-right { right: 20px; top: 50%; transform: translateY(-50%); flex-direction: column; }
         .bottom { bottom: 20px; left: 50%; transform: translateX(-50%); flex-direction: row; }
-        .btn { width: 55px; height: 55px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; border: 3px solid #ddd; }
-        #job { position: absolute; top: 20px; right: 20px; background: #00A2FF; color: white; padding: 10px 20px; border-radius: 20px; font-weight: bold; pointer-events: auto; }
+        .btn { width: 60px; height: 60px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; border: none; box-shadow: 0 5px #bbb; }
+        .btn:active { transform: translateY(4px); box-shadow: 0 0 #bbb; }
+        #job { position: absolute; top: 20px; right: 20px; background: #00A2FF; color: white; padding: 10px 25px; border-radius: 25px; font-weight: bold; pointer-events: auto; }
     </style>
 </head>
 <body>
 
     <div id="gui">
-        <div id="job">👔 Job: Police</div>
+        <div id="job">👔 Job: Citizen</div>
         <div class="panel side-right">
-            <div class="btn" onclick="alert('Car Spawned!')">🚗</div>
+            <div class="btn" onclick="spawnCar()">🚗</div>
             <div class="btn" onclick="alert('House Built!')">🏠</div>
             <div class="btn" onclick="location.reload()">🔄</div>
         </div>
@@ -62,24 +53,43 @@
         <div class="grass"></div>
         <div class="road"></div>
         <div class="house">🏠</div>
+        <div id="car"></div>
         <div id="player"></div>
     </div>
 
     <script>
         let px = 0; let py = 0;
+        let isInCar = false;
         const world = document.getElementById('world');
+        const car = document.getElementById('car');
         const keys = {};
 
         window.onkeydown = (e) => keys[e.code] = true;
         window.onkeyup = (e) => keys[e.code] = false;
 
-        function loop() {
-            if(keys['KeyW']) py += 8;
-            if(keys['KeyS']) py -= 8;
-            if(keys['KeyA']) px += 8;
-            if(keys['KeyD']) px -= 8;
+        function spawnCar() {
+            isInCar = true;
+            car.style.display = 'block';
+            alert("Vehicle Spawned! Driving Mode Active.");
+        }
 
-            world.style.transform = `rotateX(60deg) translateY(${-200 + py}px) translateX(${px}px)`;
+        function loop() {
+            let speed = isInCar ? 15 : 7;
+            
+            if(keys['KeyW']) py += speed;
+            if(keys['KeyS']) py -= speed;
+            if(keys['KeyA']) px += speed;
+            if(keys['KeyD']) px -= speed;
+
+            // FIRST PERSON CAMERA LOGIC
+            // This moves the world towards you to simulate walking
+            world.style.transform = `rotateX(0deg) translateY(${py}px) translateX(${px}px) translateZ(500px)`;
+            
+            // Sync car position if driving
+            if(isInCar) {
+                car.style.transform = `translate(-50%, -50%) translate3d(0, 0, -100px) rotateX(90deg)`;
+            }
+
             requestAnimationFrame(loop);
         }
         loop();
