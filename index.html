@@ -2,297 +2,97 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Brookhaven 3D Universe - Ultra Edition</title>
+    <title>Brookhaven 3D - Fast Load</title>
     <script src="https://cloudflare.com"></script>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { margin: 0; background: #87CEEB; overflow: hidden; font-family: sans-serif; }
         #gui { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
-        
-        /* MODERN ROBLOX HUD */
-        .panel { position: absolute; pointer-events: auto; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); border: 1.5px solid rgba(255,255,255,0.1); border-radius: 18px; padding: 15px; }
-        
-        .top-left { top: 20px; left: 20px; display: flex; gap: 12px; }
-        .side-right { right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; }
-        .bottom-hotbar { bottom: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; padding: 12px 20px; }
-
-        .btn { width: 55px; height: 55px; background: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; border: none; box-shadow: 0 5px #ccc; transition: 0.1s; }
-        .btn:active { transform: translateY(4px); box-shadow: 0 0 #ccc; }
-        .btn:hover { background: #f8f8f8; filter: brightness(1.1); }
-
-        /* DATA DISPLAYS */
-        .stats-box { position: absolute; top: 20px; right: 20px; text-align: right; pointer-events: auto; }
-        .money-tag { color: #02B757; font-size: 28px; font-weight: 900; text-shadow: 2px 2px #000; }
-        .job-tag { background: #00A2FF; color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 5px; display: inline-block; }
-
-        /* LOADING SYSTEM */
-        #loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .load-bar { width: 300px; height: 8px; background: #1a1a1a; border-radius: 4px; margin-top: 25px; overflow: hidden; border: 1px solid #333; }
-        .fill { width: 0%; height: 100%; background: linear-gradient(90deg, #00A2FF, #00ff88); animation: fill 5s forwards cubic-bezier(0.1, 0, 0.1, 1); }
-        @keyframes fill { to { width: 100%; } }
-
-        /* NOTIFICATIONS */
-        #notif { position: fixed; top: 100px; left: 50%; transform: translateX(-50%); background: rgba(0,162,255,0.9); color: white; padding: 10px 30px; border-radius: 30px; font-weight: bold; opacity: 0; transition: 0.5s; pointer-events: none; }
+        .panel { position: absolute; pointer-events: auto; background: rgba(0,0,0,0.6); padding: 10px; border-radius: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .side-right { right: 20px; top: 50%; transform: translateY(-50%); }
+        .bottom { bottom: 20px; left: 50%; transform: translateX(-50%); flex-direction: row; }
+        .btn { width: 55px; height: 55px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; border: 3px solid #ddd; box-shadow: 0 4px #bbb; }
+        .btn:active { transform: translateY(4px); box-shadow: 0 0 #bbb; }
+        #job { position: absolute; top: 20px; right: 20px; background: #00A2FF; color: white; padding: 10px 20px; border-radius: 20px; font-weight: bold; pointer-events: auto; }
     </style>
 </head>
 <body>
 
-    <div id="loader">
-        <h1 style="color:white; letter-spacing:8px; font-size:40px; margin:0;">BROOKHAVEN</h1>
-        <h2 style="color:#00A2FF; font-size:12px; letter-spacing:4px;">UNIVERSE ENGINE</h2>
-        <div class="load-bar"><div class="fill"></div></div>
-    </div>
-
-    <div id="notif">Action Logged</div>
-
     <div id="gui">
-        <div class="stats-box">
-            <div class="money-tag" id="moneyDisplay">$25,000</div>
-            <div class="job-tag" onclick="cycleJob()" id="jobDisplay">👔 Citizen</div>
-        </div>
-
-        <div class="panel top-left">
-            <div class="btn" title="House" onclick="spawnHouse()">🏠</div>
-            <div class="btn" title="Rob" onclick="performRobbery()">💰</div>
-        </div>
-
+        <div id="job" onclick="this.innerText='👔 Job: Police'">👔 Job: Citizen</div>
         <div class="panel side-right">
-            <div class="btn" onclick="toggleView()">👁️</div>
-            <div class="btn" onclick="spawnVehicle()">🚗</div>
-            <div class="btn" onclick="toggleFlashlight()">🔦</div>
+            <div class="btn" onclick="spawnCar()">🚗</div>
+            <div class="btn" onclick="spawnHouse()">🏠</div>
             <div class="btn" onclick="location.reload()">🔄</div>
         </div>
-
-        <div class="panel bottom-hotbar">
+        <div class="panel bottom">
             <div class="btn">🍕</div>
             <div class="btn">📱</div>
-            <div class="btn">🔫</div>
-            <div class="btn">🍦</div>
-            <div class="btn">🛹</div>
+            <div class="btn">🛠️</div>
         </div>
     </div>
 
     <script>
-        // --- 1. CORE ENGINE ---
+        // 1. Scene Setup (Optimized for Speed)
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 3000);
+        scene.background = new THREE.Color(0x87CEEB);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(renderer.domElement);
 
-        // Environment
-        scene.background = new THREE.Color(0x87CEEB);
-        const ambient = new THREE.AmbientLight(0xffffff, 0.7);
-        scene.add(ambient);
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(10, 20, 10);
+        scene.add(light);
+        scene.add(new THREE.AmbientLight(0xffffff, 0.7));
 
-        const sun = new THREE.DirectionalLight(0xffffff, 1.2);
-        sun.position.set(100, 200, 100);
-        sun.castShadow = true;
-        sun.shadow.camera.left = -500;
-        sun.shadow.camera.right = 500;
-        sun.shadow.camera.top = 500;
-        sun.shadow.camera.bottom = -500;
-        sun.shadow.mapSize.width = 4096;
-        sun.shadow.mapSize.height = 4096;
-        scene.add(sun);
+        // 2. Map (Road & Grass)
+        const ground = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000), new THREE.MeshStandardMaterial({color: 0x567d46}));
+        ground.rotation.x = -Math.PI/2;
+        scene.add(ground);
 
-        // --- 2. WORLD CONSTRUCTION ---
-        // Grass Base
-        const floor = new THREE.Mesh(
-            new THREE.PlaneGeometry(5000, 5000),
-            new THREE.MeshStandardMaterial({ color: 0x446e3a })
-        );
-        floor.rotation.x = -Math.PI / 2;
-        floor.receiveShadow = true;
-        scene.add(floor);
+        const road = new THREE.Mesh(new THREE.PlaneGeometry(20, 1000), new THREE.MeshStandardMaterial({color: 0x333333}));
+        road.rotation.x = -Math.PI/2;
+        road.position.y = 0.05;
+        scene.add(road);
 
-        // City Road Layout
-        const mainRoad = new THREE.Mesh(
-            new THREE.PlaneGeometry(40, 5000),
-            new THREE.MeshStandardMaterial({ color: 0x222222 })
-        );
-        mainRoad.rotation.x = -Math.PI / 2;
-        mainRoad.position.y = 0.1;
-        scene.add(mainRoad);
-
-        // Sidewalks
-        const createSidewalk = (x) => {
-            const sw = new THREE.Mesh(
-                new THREE.PlaneGeometry(15, 5000),
-                new THREE.MeshStandardMaterial({ color: 0x999999 })
-            );
-            sw.rotation.x = -Math.PI / 2;
-            sw.position.set(x, 0.15, 0);
-            scene.add(sw);
-        };
-        createSidewalk(27);
-        createSidewalk(-27);
-
-        // --- 3. MODULAR CITY BUILDING ---
-        const buildings = [];
-        function buildStructure(x, z, w, h, d, color, name) {
-            const group = new THREE.Group();
-            const body = new THREE.Mesh(
-                new THREE.BoxGeometry(w, h, d),
-                new THREE.MeshStandardMaterial({ color: color })
-            );
-            body.position.y = h/2;
-            body.castShadow = true;
-            body.receiveShadow = true;
-            group.add(body);
-
-            // Windows
-            const winGeo = new THREE.PlaneGeometry(1.5, 2);
-            const winMat = new THREE.MeshStandardMaterial({ color: 0xadebff, emissive: 0x222222 });
-            for(let i=0; i<4; i++) {
-                const win = new THREE.Mesh(winGeo, winMat);
-                win.position.set(-w/2 - 0.1, h/2 + (i*3) - 2, 0);
-                win.rotation.y = -Math.PI/2;
-                group.add(win);
-            }
-
-            group.position.set(x, 0, z);
-            scene.add(group);
-            buildings.push({ mesh: group, name: name });
-        }
-
-        // Generate Main Street
-        buildStructure(60, -100, 30, 40, 30, 0x555555, "Bank");
-        buildStructure(-60, -200, 25, 15, 25, 0xffffff, "Hospital");
-        buildStructure(60, -300, 25, 20, 25, 0x8B4513, "School");
-        
-        for(let i=0; i<20; i++) {
-            buildStructure(-60, 100 + (i*80), 20, 10, 20, 0xdddddd, "House");
-        }
-
-        // --- 4. PLAYER & INTERACTION ---
-        const player = new THREE.Group();
-        const bodyMesh = new THREE.Mesh(
-            new THREE.CapsuleGeometry(1, 2, 4, 10),
-            new THREE.MeshStandardMaterial({ color: 0x333333 })
-        );
-        bodyMesh.position.y = 2;
-        player.add(bodyMesh);
+        // 3. Player & Logic
+        const player = new THREE.Mesh(new THREE.BoxGeometry(1.5, 3, 1.5), new THREE.MeshStandardMaterial({color: 0x222222}));
+        player.position.y = 1.5;
         scene.add(player);
 
-        let cameraView = "third";
-        let money = 25000;
-        let job = "Citizen";
-        let flashlight = null;
-        let vehicle = null;
-        let inVehicle = false;
-
-        window.cycleJob = () => {
-            const jobs = ["Citizen", "Police", "Criminal", "Doctor", "Firefighter"];
-            job = jobs[(jobs.indexOf(job) + 1) % jobs.length];
-            document.getElementById('jobDisplay').innerText = "👔 " + job;
-            notify("Switched Job to " + job);
+        let car = null;
+        window.spawnCar = () => {
+            if(car) scene.remove(car);
+            car = new THREE.Mesh(new THREE.BoxGeometry(4, 2, 8), new THREE.MeshStandardMaterial({color: 0x001144}));
+            scene.add(car);
         };
 
-        window.performRobbery = () => {
-            const dist = player.position.distanceTo(new THREE.Vector3(60, 0, -100));
-            if(dist < 50) {
-                const gain = Math.floor(Math.random() * 5000) + 1000;
-                money += gain;
-                updateMoney();
-                notify("Bank Robbed! +$" + gain);
-            } else {
-                notify("Too far from Bank!");
-            }
+        window.spawnHouse = () => {
+            const h = new THREE.Mesh(new THREE.BoxGeometry(15, 10, 15), new THREE.MeshStandardMaterial({color: 0xffffff}));
+            h.position.set(25, 5, player.position.z);
+            scene.add(h);
         };
 
-        window.toggleFlashlight = () => {
-            if(flashlight) {
-                player.remove(flashlight);
-                flashlight = null;
-            } else {
-                flashlight = new THREE.SpotLight(0xffffff, 2, 50, 0.5);
-                flashlight.position.set(0, 3, 0);
-                player.add(flashlight);
-                player.add(flashlight.target);
-                flashlight.target.position.set(0, 3, -10);
-            }
-        };
-
-        window.spawnVehicle = () => {
-            if(vehicle) scene.remove(vehicle);
-            const vGroup = new THREE.Group();
-            const vBody = new THREE.Mesh(new THREE.BoxGeometry(6, 3, 12), new THREE.MeshStandardMaterial({color: 0x00A2FF}));
-            vBody.position.y = 1.5;
-            vGroup.add(vBody);
-            vGroup.position.copy(player.position);
-            scene.add(vGroup);
-            vehicle = vGroup;
-            inVehicle = true;
-            player.visible = false;
-            notify("Vehicle Spawned");
-        };
-
-        window.toggleView = () => {
-            cameraView = cameraView === "third" ? "first" : "third";
-            player.visible = cameraView === "third" && !inVehicle;
-        };
-
-        function updateMoney() {
-            document.getElementById('moneyDisplay').innerText = "$" + money.toLocaleString();
-        }
-
-        function notify(text) {
-            const n = document.getElementById('notif');
-            n.innerText = text;
-            n.style.opacity = '1';
-            setTimeout(() => n.style.opacity = '0', 2000);
-        }
-
-        // --- 5. ANIMATION LOOP ---
+        // 4. Controls
         const keys = {};
         window.onkeydown = (e) => keys[e.code] = true;
         window.onkeyup = (e) => keys[e.code] = false;
 
         function animate() {
             requestAnimationFrame(animate);
+            const s = keys['ShiftLeft'] ? 0.8 : 0.3;
+            if(keys['KeyW']) player.position.z -= s;
+            if(keys['KeyS']) player.position.z += s;
+            if(keys['KeyA']) player.position.x -= s;
+            if(keys['KeyD']) player.position.x += s;
+
+            if(car) car.position.copy(player.position);
             
-            const moveSpeed = inVehicle ? 1.5 : 0.4;
-            const rotSpeed = 0.04;
-
-            if(keys['KeyW']) player.translateZ(-moveSpeed);
-            if(keys['KeyS']) player.translateZ(moveSpeed);
-            if(keys['KeyA']) player.rotation.y += rotSpeed;
-            if(keys['KeyD']) player.rotation.y -= rotSpeed;
-
-            if(inVehicle && vehicle) {
-                vehicle.position.copy(player.position);
-                vehicle.rotation.copy(player.rotation);
-            }
-
-            // Camera System
-            if(cameraView === "third") {
-                const offset = new THREE.Vector3(0, 15, 30).applyMatrix4(player.matrixWorld);
-                camera.position.lerp(offset, 0.1);
-                camera.lookAt(player.position);
-            } else {
-                camera.position.copy(player.position);
-                camera.position.y += 3;
-                const lookDir = new THREE.Vector3(0, 0, -1).applyQuaternion(player.quaternion);
-                camera.lookAt(player.position.clone().add(lookDir));
-            }
-
+            camera.position.set(player.position.x, player.position.y + 12, player.position.z + 18);
+            camera.lookAt(player.position);
             renderer.render(scene, camera);
         }
-
-        // START ENGINE
-        setTimeout(() => {
-            document.getElementById('loader').style.opacity = '0';
-            setTimeout(() => document.getElementById('loader').remove(), 1000);
-            animate();
-        }, 5000);
-
-        window.onresize = () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        };
+        animate();
     </script>
 </body>
 </html>
