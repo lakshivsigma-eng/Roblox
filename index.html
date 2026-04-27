@@ -1,98 +1,1226 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Brookhaven 3D - First Person</title>
-    <style>
-        body { margin: 0; background: #87CEEB; overflow: hidden; perspective: 800px; font-family: sans-serif; }
-        
-        /* FIRST PERSON VIEW */
-        #world { 
-            position: absolute; width: 100vw; height: 100vh;
-            transform-style: preserve-3d;
-            /* This angle makes it feel like First Person */
-            transform: rotateX(0deg) translateY(0px) translateZ(500px);
-            transition: transform 0.05s linear;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roblox</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg1:#191B1D;--bg2:#232527;--bg3:#2D2F31;--bg4:#383A3C;
+  --blue:#00A2FF;--blue2:#0080CC;--green:#00B06B;
+  --text:#FFFFFF;--text2:#B8B8B8;--text3:#6F6F6F;
+  --red:#FF4444;--gold:#FFD700;
+  --radius:8px;
+}
+body{background:var(--bg1);color:var(--text);font-family:'Nunito',sans-serif;overflow-x:hidden}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg1)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
 
-        .grass { position: absolute; width: 8000px; height: 8000px; background: #567d46; top: -4000px; left: -4000px; transform: rotateX(90deg); }
-        .road { position: absolute; width: 150px; height: 8000px; background: #333; left: 50%; top: -4000px; transform: translateX(-50%) rotateX(90deg) translateZ(1px); border-left: 10px dashed white; border-right: 10px dashed white; }
+/* NAV */
+#nav{position:fixed;top:0;left:0;right:0;height:52px;background:var(--bg2);border-bottom:1px solid var(--bg4);display:flex;align-items:center;gap:16px;padding:0 16px;z-index:999}
+#nav .logo{font-size:22px;font-weight:900;color:var(--text);letter-spacing:-1px;cursor:pointer}
+#nav .logo span{color:var(--blue)}
+.nav-links{display:flex;gap:4px}
+.nav-link{padding:6px 12px;border-radius:6px;font-size:13px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:.5px}
+.nav-link:hover,.nav-link.active{background:var(--bg4);color:var(--text)}
+.search-bar{flex:1;max-width:320px;margin:0 8px;position:relative}
+.search-bar input{width:100%;background:var(--bg3);border:1px solid var(--bg4);border-radius:var(--radius);padding:7px 12px 7px 36px;color:var(--text);font-family:'Nunito',sans-serif;font-size:13px;outline:none}
+.search-bar input:focus{border-color:var(--blue)}
+.search-bar svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--text3);fill:none;stroke-width:2;stroke-linecap:round}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.robux-btn{display:flex;align-items:center;gap:6px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);padding:6px 12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;transition:all .2s}
+.robux-btn:hover{background:var(--blue2)}
+.icon-btn{width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1px solid var(--bg4);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
+.icon-btn:hover{background:var(--bg4)}
+.icon-btn svg{width:18px;height:18px;stroke:var(--text2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.avatar-btn{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#FF6B35,#FF4444);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;cursor:pointer;border:2px solid var(--blue)}
 
-        .house { position: absolute; width: 150px; height: 100px; background: white; border: 4px solid #444; transform: translate3d(200px, -50px, -600px); display: flex; align-items: center; justify-content: center; font-size: 50px; }
-        
-        #player { position: absolute; width: 40px; height: 40px; background: #222; left: 50%; top: 50%; transform: translate(-50%, -50%) translateZ(0px); border-radius: 50%; opacity: 0; } /* Hidden in First Person */
-        #car { display: none; position: absolute; width: 100px; height: 180px; background: #001144; left: 50%; top: 50%; transform: translate(-50%, -50%) translateZ(-50px) rotateX(90deg); border-radius: 15px; border: 5px solid #000; }
+/* LAYOUT */
+#main{margin-top:52px;display:flex}
+#sidebar{width:200px;min-height:calc(100vh - 52px);background:var(--bg2);border-right:1px solid var(--bg4);padding:16px 8px;flex-shrink:0;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto}
+.sidebar-label{font-size:10px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:4px 12px;margin-bottom:4px}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius);cursor:pointer;transition:all .2s;margin-bottom:2px}
+.sidebar-item:hover{background:var(--bg3)}
+.sidebar-item.active{background:var(--bg3);color:var(--blue)}
+.sidebar-item svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.sidebar-item span{font-size:13px;font-weight:600}
+.sidebar-divider{height:1px;background:var(--bg4);margin:8px 12px}
 
-        /* UI HUD */
-        #gui { position: fixed; inset: 0; pointer-events: none; z-index: 1000; }
-        .panel { position: absolute; pointer-events: auto; background: rgba(0,0,0,0.6); padding: 12px; border-radius: 15px; display: flex; gap: 10px; }
-        .side-right { right: 20px; top: 50%; transform: translateY(-50%); flex-direction: column; }
-        .bottom { bottom: 20px; left: 50%; transform: translateX(-50%); flex-direction: row; }
-        .btn { width: 60px; height: 60px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; border: none; box-shadow: 0 5px #bbb; }
-        .btn:active { transform: translateY(4px); box-shadow: 0 0 #bbb; }
-        #job { position: absolute; top: 20px; right: 20px; background: #00A2FF; color: white; padding: 10px 25px; border-radius: 25px; font-weight: bold; pointer-events: auto; }
-    </style>
+#content{flex:1;min-width:0;padding:24px}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#1a1f3a 0%,#192a2a 50%,#1a1a2e 100%);border-radius:12px;padding:32px;margin-bottom:28px;position:relative;overflow:hidden;border:1px solid var(--bg4)}
+.hero::before{content:'';position:absolute;top:-50%;right:-10%;width:400px;height:400px;background:radial-gradient(circle,rgba(0,162,255,.15) 0%,transparent 70%);pointer-events:none}
+.hero h1{font-size:28px;font-weight:900;margin-bottom:8px}
+.hero h1 span{color:var(--blue)}
+.hero p{color:var(--text2);font-size:14px;margin-bottom:20px;max-width:500px}
+.hero-btns{display:flex;gap:10px}
+.btn-primary{background:var(--blue);color:#fff;border:none;border-radius:var(--radius);padding:10px 20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-primary:hover{background:var(--blue2);transform:translateY(-1px)}
+.btn-secondary{background:transparent;color:var(--text);border:2px solid var(--bg4);border-radius:var(--radius);padding:10px 20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-secondary:hover{border-color:var(--blue);color:var(--blue)}
+
+/* SECTIONS */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-title{font-size:18px;font-weight:800}
+.see-all{font-size:13px;font-weight:700;color:var(--blue);cursor:pointer}
+.see-all:hover{text-decoration:underline}
+
+/* CONTINUE PLAYING */
+.continue-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+.continue-scroll::-webkit-scrollbar{height:4px}
+.continue-card{flex-shrink:0;width:160px;background:var(--bg2);border-radius:var(--radius);border:1px solid var(--bg4);overflow:hidden;cursor:pointer;transition:all .2s}
+.continue-card:hover{border-color:var(--blue);transform:translateY(-2px)}
+.continue-thumb{width:100%;aspect-ratio:16/9;background-size:cover;background-position:center;position:relative}
+.continue-badge{position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.8);border-radius:4px;padding:2px 6px;font-size:10px;font-weight:700;color:var(--blue)}
+.continue-info{padding:8px}
+.continue-info h4{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.continue-info p{font-size:11px;color:var(--text2)}
+
+/* GAME GRID */
+.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
+.game-card{background:var(--bg2);border-radius:var(--radius);border:1px solid var(--bg4);overflow:hidden;cursor:pointer;transition:all .25s}
+.game-card:hover{border-color:var(--blue);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,162,255,.15)}
+.game-card:hover .play-overlay{opacity:1}
+.game-thumb{width:100%;aspect-ratio:16/9;background-size:cover;background-position:center;position:relative;overflow:hidden}
+.game-thumb-canvas{width:100%;height:100%;display:block}
+.play-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
+.play-btn-overlay{width:44px;height:44px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.play-btn-overlay::after{content:'';border-left:16px solid #fff;border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:3px}
+.game-info{padding:10px}
+.game-info h3{font-size:13px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.game-meta{display:flex;gap:10px;align-items:center}
+.game-likes{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--green);font-weight:700}
+.game-players{display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);font-weight:600}
+.game-meta svg{width:11px;height:11px;fill:currentColor}
+
+/* SORT CHIPS */
+.chips{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.chip{padding:6px 14px;border-radius:20px;background:var(--bg3);border:1px solid var(--bg4);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:.5px}
+.chip:hover{border-color:var(--blue2);color:var(--blue)}
+.chip.active{background:var(--blue);border-color:var(--blue);color:#fff}
+
+/* FRIENDS */
+.friends-section{margin-top:24px}
+.friend-list{display:flex;flex-direction:column;gap:6px}
+.friend-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius);cursor:pointer;transition:all .2s}
+.friend-item:hover{background:var(--bg3)}
+.friend-avatar{width:36px;height:36px;border-radius:50%;position:relative;flex-shrink:0}
+.friend-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.friend-dot{position:absolute;bottom:1px;right:1px;width:10px;height:10px;border-radius:50%;border:2px solid var(--bg2)}
+.friend-dot.online{background:var(--green)}
+.friend-dot.away{background:var(--gold)}
+.friend-info h4{font-size:13px;font-weight:700}
+.friend-info p{font-size:11px;color:var(--text2)}
+
+/* GAME MODAL / LAUNCHER */
+#launcher{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9999;display:none;flex-direction:column}
+#launcher.open{display:flex}
+#launcher-header{height:48px;background:var(--bg2);border-bottom:1px solid var(--bg4);display:flex;align-items:center;padding:0 16px;gap:16px}
+#launcher-title{font-size:15px;font-weight:800;flex:1}
+#launcher-close{background:none;border:none;color:var(--text2);font-size:22px;cursor:pointer;line-height:1;padding:4px}
+#launcher-close:hover{color:var(--text)}
+#launcher-body{flex:1;position:relative;overflow:hidden}
+#game-canvas{display:block;width:100%;height:100%}
+#game-ui{position:absolute;inset:0;pointer-events:none}
+#health-bar-wrap{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px}
+#health-bar{width:200px;height:10px;background:rgba(255,255,255,.2);border-radius:5px;overflow:hidden}
+#health-fill{height:100%;background:var(--green);width:100%;transition:width .3s}
+#score-display{position:absolute;top:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);border-radius:8px;padding:8px 20px;font-size:18px;font-weight:800;pointer-events:none}
+#crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:20px;height:20px;pointer-events:none}
+#crosshair::before,#crosshair::after{content:'';position:absolute;background:rgba(255,255,255,.8);border-radius:1px}
+#crosshair::before{width:2px;height:100%;left:50%;transform:translateX(-50%)}
+#crosshair::after{width:100%;height:2px;top:50%;transform:translateY(-50%)}
+#game-msg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);border-radius:12px;padding:20px 32px;text-align:center;font-size:20px;font-weight:800;display:none;z-index:10}
+#controls-hint{position:absolute;bottom:70px;right:16px;background:rgba(0,0,0,.6);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--text2);pointer-events:none;line-height:1.8}
+#minimap{position:absolute;top:16px;right:16px;width:100px;height:100px;border-radius:8px;border:1px solid var(--bg4);overflow:hidden;pointer-events:none}
+
+/* LOADING SCREEN */
+#loading-screen{position:fixed;inset:0;background:#000;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity .5s}
+#loading-screen.hidden{opacity:0;pointer-events:none}
+.loading-logo{font-size:40px;font-weight:900;letter-spacing:-2px}
+.loading-logo span{color:var(--blue)}
+.loading-bar-wrap{width:300px;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.loading-bar-fill{height:100%;background:var(--blue);border-radius:3px;animation:loadanim 1.5s ease forwards}
+@keyframes loadanim{from{width:0}to{width:100%}}
+.loading-text{font-size:13px;color:var(--text2);font-weight:600}
+
+/* NOTIFICATION BADGE */
+.notif-badge{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;border-radius:50%;width:16px;height:16px;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg2)}
+
+/* SECTION SPACING */
+.mb-section{margin-bottom:28px}
+</style>
 </head>
 <body>
 
-    <div id="gui">
-        <div id="job">👔 Job: Citizen</div>
-        <div class="panel side-right">
-            <div class="btn" onclick="spawnCar()">🚗</div>
-            <div class="btn" onclick="alert('House Built!')">🏠</div>
-            <div class="btn" onclick="location.reload()">🔄</div>
+<!-- LOADING -->
+<div id="loading-screen">
+  <div class="loading-logo">RO<span>BLO</span>X</div>
+  <div class="loading-bar-wrap"><div class="loading-bar-fill"></div></div>
+  <div class="loading-text">Loading experience...</div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="logo">RO<span>BLO</span>X</div>
+  <div class="nav-links">
+    <div class="nav-link active" onclick="showPage('home')">Home</div>
+    <div class="nav-link" onclick="showPage('discover')">Discover</div>
+    <div class="nav-link" onclick="showPage('avatar')">Avatar</div>
+  </div>
+  <div class="search-bar">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" placeholder="Search games, items, players...">
+  </div>
+  <div class="nav-right">
+    <button class="robux-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      R$ 450
+    </button>
+    <div class="icon-btn" style="position:relative">
+      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="notif-badge">3</span>
+    </div>
+    <div class="icon-btn">
+      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </div>
+    <div class="avatar-btn">ME</div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sidebar-label">Menu</div>
+    <div class="sidebar-item active" onclick="showPage('home')">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Home</span>
+    </div>
+    <div class="sidebar-item" onclick="showPage('discover')">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span>Discover</span>
+    </div>
+    <div class="sidebar-item">
+      <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span>Featured</span>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">You</div>
+    <div class="sidebar-item">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>Profile</span>
+    </div>
+    <div class="sidebar-item">
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      <span>Avatar</span>
+    </div>
+    <div class="sidebar-item">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Friends</span>
+    </div>
+    <div class="sidebar-item">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span>Inventory</span>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Socials</div>
+    <div class="sidebar-item">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Messages</span>
+    </div>
+    <div class="sidebar-item">
+      <svg viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 0 0-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 0 1 5.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 0 1 9.288 0"/></svg>
+      <span>Groups</span>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main id="content">
+    <!-- HOME PAGE -->
+    <div id="page-home">
+      <div class="hero">
+        <h1>Welcome back, <span>Player1</span>!</h1>
+        <p>Explore millions of immersive experiences with friends. Build, play, and share in our world.</p>
+        <div class="hero-btns">
+          <button class="btn-primary" onclick="showPage('discover')">Discover Games</button>
+          <button class="btn-secondary">Create Game</button>
         </div>
-        <div class="panel bottom">
-            <div class="btn">🍕</div>
-            <div class="btn">📱</div>
-            <div class="btn">🛠️</div>
+      </div>
+
+      <div class="mb-section">
+        <div class="section-header">
+          <div class="section-title">⏯ Continue Playing</div>
+          <div class="see-all">See All</div>
         </div>
+        <div class="continue-scroll" id="continue-scroll"></div>
+      </div>
+
+      <div class="mb-section">
+        <div class="section-header">
+          <div class="section-title">🔥 Popular Right Now</div>
+          <div class="see-all">See All</div>
+        </div>
+        <div class="game-grid" id="popular-grid"></div>
+      </div>
+
+      <div class="mb-section">
+        <div class="section-header">
+          <div class="section-title">👥 Friends Online</div>
+        </div>
+        <div class="friend-list" id="friend-list"></div>
+      </div>
     </div>
 
-    <div id="world">
-        <div class="grass"></div>
-        <div class="road"></div>
-        <div class="house">🏠</div>
-        <div id="car"></div>
-        <div id="player"></div>
+    <!-- DISCOVER PAGE -->
+    <div id="page-discover" style="display:none">
+      <div class="section-header">
+        <div class="section-title">🌍 Discover</div>
+      </div>
+      <div class="chips" id="chips">
+        <div class="chip active" onclick="filterGames('all',this)">All Games</div>
+        <div class="chip" onclick="filterGames('action',this)">⚔️ Action</div>
+        <div class="chip" onclick="filterGames('adventure',this)">🗺️ Adventure</div>
+        <div class="chip" onclick="filterGames('obby',this)">🏃 Obby</div>
+        <div class="chip" onclick="filterGames('simulator',this)">🎮 Simulator</div>
+        <div class="chip" onclick="filterGames('roleplay',this)">🎭 Roleplay</div>
+        <div class="chip" onclick="filterGames('fps',this)">🔫 FPS</div>
+      </div>
+      <div class="game-grid" id="discover-grid"></div>
     </div>
 
-    <script>
-        let px = 0; let py = 0;
-        let isInCar = false;
-        const world = document.getElementById('world');
-        const car = document.getElementById('car');
-        const keys = {};
+    <!-- AVATAR PAGE -->
+    <div id="page-avatar" style="display:none">
+      <div style="text-align:center;padding:80px 20px;color:var(--text2)">
+        <div style="font-size:48px;margin-bottom:16px">👤</div>
+        <div style="font-size:18px;font-weight:700">Avatar Editor</div>
+        <div style="font-size:14px;margin-top:8px">Customize your look — coming soon!</div>
+      </div>
+    </div>
+  </main>
+</div>
 
-        window.onkeydown = (e) => keys[e.code] = true;
-        window.onkeyup = (e) => keys[e.code] = false;
+<!-- GAME LAUNCHER -->
+<div id="launcher">
+  <div id="launcher-header">
+    <button id="launcher-close" onclick="closeLauncher()">✕</button>
+    <div id="launcher-title">Loading Game...</div>
+    <div id="hud-stats" style="display:flex;gap:16px;font-size:12px;color:var(--text2)"></div>
+  </div>
+  <div id="launcher-body">
+    <canvas id="game-canvas"></canvas>
+    <div id="game-ui">
+      <div id="score-display">Score: <span id="score-val">0</span></div>
+      <div id="crosshair"></div>
+      <div id="health-bar-wrap">
+        <div style="font-size:11px;color:var(--text2);font-weight:700">❤️ Health</div>
+        <div id="health-bar"><div id="health-fill"></div></div>
+      </div>
+      <div id="controls-hint">
+        WASD — Move<br>
+        Mouse — Look<br>
+        Space — Jump<br>
+        Click — Action<br>
+        ESC — Menu
+      </div>
+      <canvas id="minimap"></canvas>
+      <div id="game-msg"></div>
+    </div>
+  </div>
+</div>
 
-        function spawnCar() {
-            isInCar = true;
-            car.style.display = 'block';
-            alert("Vehicle Spawned! Driving Mode Active.");
+<script>
+// =========================================================
+//  GAME DATA
+// =========================================================
+const GAMES = [
+  {id:'obby',title:'Tower of Hell',category:'obby',players:'142.5K',likes:97,color:'#FF6B35',desc:'Climb the ultimate tower!',
+   gradient:['#FF6B35','#FF4444','#FF8C00']},
+  {id:'fps',title:'Arsenal',category:'fps',players:'89.2K',likes:95,color:'#00A2FF',desc:'Intense gun battles!',
+   gradient:['#00A2FF','#0040CC','#003399']},
+  {id:'roleplay',title:'Brookhaven RP',category:'roleplay',players:'204K',likes:88,color:'#00D084',desc:'Live your dream life!',
+   gradient:['#00D084','#009960','#006640']},
+  {id:'adventure',title:'Blox Fruits',category:'adventure',players:'176K',likes:91,color:'#FFD700',desc:'Sail the seas & eat fruits!',
+   gradient:['#FFD700','#FF8C00','#FF4500']},
+  {id:'simulator',title:'Pet Simulator X',category:'simulator',players:'93K',likes:94,color:'#FF69B4',desc:'Collect epic pets!',
+   gradient:['#FF69B4','#FF1493','#C71585']},
+  {id:'action',title:'Bedwars',category:'action',players:'67K',likes:96,color:'#9B59B6',desc:'Protect your bed!',
+   gradient:['#9B59B6','#6C3483','#4A235A']},
+  {id:'adventure',title:'Adopt Me!',category:'adventure',players:'312K',likes:83,color:'#1ABC9C',desc:'Raise cute pets!',
+   gradient:['#1ABC9C','#17A589','#0E6655']},
+  {id:'fps',title:'Phantom Forces',category:'fps',players:'45K',likes:92,color:'#E74C3C',desc:'Tactical military FPS!',
+   gradient:['#E74C3C','#922B21','#641E16']},
+  {id:'obby',title:'Natural Disaster',category:'obby',players:'38K',likes:89,color:'#F39C12',desc:'Survive disasters!',
+   gradient:['#F39C12','#D68910','#9A6109']},
+  {id:'roleplay',title:'Work at Pizza Place',category:'roleplay',players:'29K',likes:85,color:'#E67E22',desc:'Run the pizza shop!',
+   gradient:['#E67E22','#CA6F1E','#935116']},
+  {id:'simulator',title:'Murder Mystery 2',category:'simulator',players:'55K',likes:90,color:'#2C3E50',desc:'Find the murderer!',
+   gradient:['#2C3E50','#1A252F','#17202A']},
+  {id:'action',title:'Shindo Life',category:'action',players:'78K',likes:87,color:'#8E44AD',desc:'Ninja powers & battles!',
+   gradient:['#8E44AD','#6C3483','#4A235A']},
+  {id:'adventure',title:'Treasure Hunt Sim',category:'adventure',players:'22K',likes:82,color:'#27AE60',desc:'Dig for rare loot!',
+   gradient:['#27AE60','#1D8348','#145A32']},
+  {id:'fps',title:'Big Paintball',category:'fps',players:'31K',likes:93,color:'#16A085',desc:'Colorful paintball wars!',
+   gradient:['#16A085','#117A65','#0E6655']},
+  {id:'obby',title:'Speed Run 4',category:'obby',players:'19K',likes:88,color:'#3498DB',desc:'Race to the finish!',
+   gradient:['#3498DB','#2471A3','#1A5276']},
+];
+
+const FRIENDS = [
+  {name:'xXNinja_Pro',status:'online',game:'Arsenal',color:'#FF6B35'},
+  {name:'BuilderGirl99',status:'online',game:'Brookhaven',color:'#FF69B4'},
+  {name:'CoolDude2009',status:'away',game:'Away',color:'#00A2FF'},
+  {name:'StarPlayer_X',status:'online',game:'Blox Fruits',color:'#FFD700'},
+  {name:'SpeedRunner',status:'online',game:'Tower of Hell',color:'#9B59B6'},
+];
+
+// =========================================================
+//  RENDER GAME THUMBNAILS with mini Three.js previews
+// =========================================================
+function renderMiniThumb(canvas, game) {
+  const w = canvas.offsetWidth || 180;
+  const h = canvas.offsetHeight || 101;
+  canvas.width = w; canvas.height = h;
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:false});
+  renderer.setSize(w, h);
+  renderer.shadowMap.enabled = true;
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(game.gradient[0]);
+  scene.fog = new THREE.Fog(game.gradient[0], 10, 30);
+  const camera = new THREE.PerspectiveCamera(60, w/h, 0.1, 100);
+  camera.position.set(0, 3, 6);
+  camera.lookAt(0, 0, 0);
+  const amb = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(amb);
+  const dir = new THREE.DirectionalLight(0xffffff, 1.2);
+  dir.position.set(5, 10, 5);
+  dir.castShadow = true;
+  scene.add(dir);
+
+  // Floor
+  const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(20, 20),
+    new THREE.MeshLambertMaterial({color: new THREE.Color(game.gradient[2])})
+  );
+  floor.rotation.x = -Math.PI/2;
+  floor.receiveShadow = true;
+  scene.add(floor);
+
+  // Game-specific objects
+  const objs = [];
+  if(game.category === 'obby') {
+    for(let i=0;i<8;i++) {
+      const m = new THREE.Mesh(
+        new THREE.BoxGeometry(1.5, 0.3, 1.5),
+        new THREE.MeshLambertMaterial({color: new THREE.Color([game.gradient[0],game.gradient[1],game.gradient[2]][i%3])})
+      );
+      m.position.set(Math.sin(i*0.8)*2, i*0.6, Math.cos(i*0.8)*2 - i*0.3);
+      m.castShadow = true; m.receiveShadow = true;
+      scene.add(m); objs.push(m);
+    }
+  } else if(game.category === 'fps') {
+    for(let i=0;i<5;i++) {
+      const m = new THREE.Mesh(
+        new THREE.BoxGeometry(0.3, 1.6, 0.3),
+        new THREE.MeshLambertMaterial({color: new THREE.Color(game.gradient[1])})
+      );
+      m.position.set((i-2)*1.2, 0.8, -2+Math.random()*2);
+      m.castShadow = true;
+      scene.add(m); objs.push(m);
+    }
+    const gun = new THREE.Mesh(
+      new THREE.BoxGeometry(0.15, 0.15, 0.8),
+      new THREE.MeshLambertMaterial({color: 0x333333})
+    );
+    gun.position.set(0.4, 1.2, 0);
+    scene.add(gun); objs.push(gun);
+  } else if(game.category === 'adventure') {
+    for(let i=0;i<6;i++) {
+      const tree = new THREE.Group();
+      const trunk = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.1, 0.15, 1, 6),
+        new THREE.MeshLambertMaterial({color: 0x8B4513})
+      );
+      const leaves = new THREE.Mesh(
+        new THREE.SphereGeometry(0.5, 8, 6),
+        new THREE.MeshLambertMaterial({color: new THREE.Color(game.gradient[0])})
+      );
+      leaves.position.y = 0.8;
+      tree.add(trunk); tree.add(leaves);
+      tree.position.set((Math.random()-0.5)*8, 0.5, (Math.random()-0.5)*6 - 2);
+      tree.castShadow = true;
+      scene.add(tree); objs.push(tree);
+    }
+  } else if(game.category === 'roleplay') {
+    const house = new THREE.Group();
+    const body = new THREE.Mesh(
+      new THREE.BoxGeometry(3, 2, 2),
+      new THREE.MeshLambertMaterial({color: new THREE.Color(game.gradient[1])})
+    );
+    const roof = new THREE.Mesh(
+      new THREE.ConeGeometry(2.2, 1.5, 4),
+      new THREE.MeshLambertMaterial({color: new THREE.Color(game.gradient[0])})
+    );
+    roof.position.y = 1.75; roof.rotation.y = Math.PI/4;
+    house.add(body); house.add(roof);
+    house.position.set(0, 1, -2);
+    scene.add(house); objs.push(house);
+  } else if(game.category === 'simulator') {
+    for(let i=0;i<12;i++) {
+      const gem = new THREE.Mesh(
+        new THREE.OctahedronGeometry(0.2+Math.random()*0.2),
+        new THREE.MeshLambertMaterial({color: new THREE.Color().setHSL(Math.random(), 1, 0.6)})
+      );
+      gem.position.set((Math.random()-0.5)*6, 0.3+Math.random()*1.5, (Math.random()-0.5)*4 - 1);
+      scene.add(gem); objs.push(gem);
+    }
+  } else {
+    for(let i=0;i<4;i++) {
+      const m = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 1+(Math.random()*2), 1),
+        new THREE.MeshLambertMaterial({color: new THREE.Color(game.gradient[i%3])})
+      );
+      m.position.set((i-1.5)*1.5, m.geometry.parameters.height/2, -2);
+      m.castShadow = true;
+      scene.add(m); objs.push(m);
+    }
+  }
+
+  let frame = 0;
+  const animId = [];
+  function animate() {
+    animId[0] = requestAnimationFrame(animate);
+    frame++;
+    objs.forEach((o, i) => {
+      o.rotation.y = frame * 0.01 + i * 0.5;
+      if(game.category === 'simulator') o.position.y = 0.3 + Math.sin(frame*0.05 + i) * 0.3;
+    });
+    renderer.render(scene, camera);
+  }
+  animate();
+  canvas._stopAnim = () => { cancelAnimationFrame(animId[0]); renderer.dispose(); };
+}
+
+// =========================================================
+//  BUILD GAME CARDS
+// =========================================================
+function buildCard(game, mini=false) {
+  const card = document.createElement('div');
+  card.className = 'game-card';
+  card.dataset.category = game.category;
+  card.innerHTML = `
+    <div class="game-thumb">
+      <canvas class="game-thumb-canvas" style="width:100%;height:100%;display:block"></canvas>
+      <div class="play-overlay">
+        <div class="play-btn-overlay"></div>
+      </div>
+    </div>
+    <div class="game-info">
+      <h3>${game.title}</h3>
+      <div class="game-meta">
+        <span class="game-likes">
+          <svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/></svg>
+          ${game.likes}%
+        </span>
+        <span class="game-players">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          ${game.players}
+        </span>
+      </div>
+    </div>`;
+  card.onclick = () => launchGame(game);
+
+  setTimeout(() => {
+    const canvas = card.querySelector('canvas');
+    if(canvas) renderMiniThumb(canvas, game);
+  }, 100);
+
+  return card;
+}
+
+// =========================================================
+//  POPULATE PAGES
+// =========================================================
+function populateHome() {
+  // Continue playing (first 5)
+  const cont = document.getElementById('continue-scroll');
+  GAMES.slice(0,5).forEach(g => {
+    const c = document.createElement('div');
+    c.className = 'continue-card';
+    c.innerHTML = `<div class="continue-thumb" style="background:linear-gradient(135deg,${g.gradient[0]},${g.gradient[2]})"><span class="continue-badge">Lv.12</span></div><div class="continue-info"><h4>${g.title}</h4><p>${g.players} playing</p></div>`;
+    c.onclick = () => launchGame(g);
+    cont.appendChild(c);
+  });
+
+  // Popular grid (8 games)
+  const pg = document.getElementById('popular-grid');
+  GAMES.slice(0,8).forEach(g => pg.appendChild(buildCard(g)));
+
+  // Friends
+  const fl = document.getElementById('friend-list');
+  FRIENDS.forEach(f => {
+    const d = document.createElement('div');
+    d.className = 'friend-item';
+    d.innerHTML = `
+      <div class="friend-avatar">
+        <div style="width:36px;height:36px;border-radius:50%;background:${f.color};display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px">${f.name[0]}</div>
+        <div class="friend-dot ${f.status}"></div>
+      </div>
+      <div class="friend-info">
+        <h4>${f.name}</h4>
+        <p>${f.status === 'online' ? '🎮 '+f.game : '💤 Away'}</p>
+      </div>`;
+    fl.appendChild(d);
+  });
+}
+
+function populateDiscover() {
+  const grid = document.getElementById('discover-grid');
+  grid.innerHTML = '';
+  GAMES.forEach(g => grid.appendChild(buildCard(g)));
+}
+
+function filterGames(cat, el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const grid = document.getElementById('discover-grid');
+  grid.innerHTML = '';
+  const filtered = cat === 'all' ? GAMES : GAMES.filter(g => g.category === cat);
+  filtered.forEach(g => grid.appendChild(buildCard(g)));
+}
+
+// =========================================================
+//  PAGE SWITCHER
+// =========================================================
+function showPage(id) {
+  ['home','discover','avatar'].forEach(p => {
+    document.getElementById('page-'+p).style.display = p === id ? '' : 'none';
+  });
+  document.querySelectorAll('.nav-link').forEach((el,i) => {
+    el.classList.toggle('active', ['home','discover','avatar'][i] === id);
+  });
+  document.querySelectorAll('.sidebar-item').forEach((el,i) => {
+    el.classList.toggle('active', i === ({'home':0,'discover':1}[id] ?? -1));
+  });
+  if(id === 'discover') populateDiscover();
+}
+
+// =========================================================
+//  3D GAME ENGINE
+// =========================================================
+let activeGame = null;
+let gameRenderer, gameScene, gameCamera, gameClock;
+let player = {x:0,y:1.6,z:5, vx:0,vy:0,vz:0, yaw:0, pitch:0, onGround:true, health:100};
+let keys = {};
+let score = 0;
+let enemies = [], platforms = [], collectibles = [];
+let animFrameId;
+let mouseLocked = false;
+let gameType = '';
+
+function launchGame(game) {
+  activeGame = game;
+  gameType = game.category;
+  document.getElementById('launcher').classList.add('open');
+  document.getElementById('launcher-title').textContent = '🎮  ' + game.title;
+  document.body.style.overflow = 'hidden';
+  initGame3D(game);
+}
+
+function closeLauncher() {
+  document.getElementById('launcher').classList.remove('open');
+  document.body.style.overflow = '';
+  if(animFrameId) cancelAnimationFrame(animFrameId);
+  if(gameRenderer) gameRenderer.dispose();
+  if(document.pointerLockElement) document.exitPointerLock();
+  enemies = []; platforms = []; collectibles = [];
+  score = 0;
+  player = {x:0,y:1.6,z:5,vx:0,vy:0,vz:0,yaw:0,pitch:0,onGround:true,health:100};
+  document.getElementById('health-fill').style.width = '100%';
+  document.getElementById('score-val').textContent = '0';
+  document.getElementById('game-msg').style.display = 'none';
+}
+
+function initGame3D(game) {
+  const canvas = document.getElementById('game-canvas');
+  const w = canvas.parentElement.clientWidth;
+  const h = canvas.parentElement.clientHeight;
+
+  if(gameRenderer) gameRenderer.dispose();
+  gameRenderer = new THREE.WebGLRenderer({canvas, antialias:true});
+  gameRenderer.setSize(w, h);
+  gameRenderer.shadowMap.enabled = true;
+  gameRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  gameRenderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+
+  gameScene = new THREE.Scene();
+  gameClock = new THREE.Clock();
+
+  gameCamera = new THREE.PerspectiveCamera(75, w/h, 0.05, 1000);
+  gameCamera.position.set(0,1.6,5);
+
+  // LIGHTING
+  const amb = new THREE.AmbientLight(0xffffff, 0.5);
+  gameScene.add(amb);
+  const sun = new THREE.DirectionalLight(0xffffff, 1.5);
+  sun.position.set(20, 40, 20);
+  sun.castShadow = true;
+  sun.shadow.mapSize.width = 2048;
+  sun.shadow.mapSize.height = 2048;
+  sun.shadow.camera.near = 0.5;
+  sun.shadow.camera.far = 200;
+  sun.shadow.camera.left = -50;
+  sun.shadow.camera.right = 50;
+  sun.shadow.camera.top = 50;
+  sun.shadow.camera.bottom = -50;
+  gameScene.add(sun);
+  const hemi = new THREE.HemisphereLight(0x87CEEB, 0x3D7B3D, 0.4);
+  gameScene.add(hemi);
+
+  // BUILD WORLD
+  buildWorld(game);
+
+  // INPUT
+  canvas.addEventListener('click', () => canvas.requestPointerLock());
+  document.addEventListener('pointerlockchange', () => {
+    mouseLocked = document.pointerLockElement === canvas;
+  });
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('keydown', e => { keys[e.code] = true; e.preventDefault(); });
+  document.addEventListener('keyup', e => { keys[e.code] = false; });
+  canvas.addEventListener('click', onShoot);
+  window.addEventListener('resize', () => {
+    const w2 = canvas.parentElement.clientWidth;
+    const h2 = canvas.parentElement.clientHeight;
+    gameCamera.aspect = w2/h2;
+    gameCamera.updateProjectionMatrix();
+    gameRenderer.setSize(w2, h2);
+  });
+
+  // HUD
+  updateHUD();
+  showMsg(`🎮 ${game.title}`, `Click to play · WASD to move · Space to jump`, 3000);
+  gameLoop();
+}
+
+function buildWorld(game) {
+  platforms = []; enemies = []; collectibles = [];
+  player = {x:0,y:1.6,z:5,vx:0,vy:0,vz:0,yaw:0,pitch:0,onGround:true,health:100};
+
+  const CAT = game.category;
+  const c1 = new THREE.Color(game.gradient[0]);
+  const c2 = new THREE.Color(game.gradient[1]);
+  const c3 = new THREE.Color(game.gradient[2]);
+
+  const skyColor = CAT === 'fps' ? 0x1a1a2e : CAT === 'obby' ? 0x87CEEB : CAT === 'adventure' ? 0x70B8FF : 0x87CEEB;
+  gameScene.background = new THREE.Color(skyColor);
+  gameScene.fog = new THREE.Fog(skyColor, 30, 100);
+
+  function makePlatform(x,y,z,w,h,d,color,mat) {
+    const mesh = new THREE.Mesh(
+      new THREE.BoxGeometry(w,h,d),
+      mat || new THREE.MeshLambertMaterial({color})
+    );
+    mesh.position.set(x,y,z);
+    mesh.castShadow = true; mesh.receiveShadow = true;
+    gameScene.add(mesh);
+    platforms.push({mesh, x,y:y+h/2,z,w,h,d});
+    return mesh;
+  }
+
+  function makeEnemy(x,y,z,type,color) {
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(
+      new THREE.BoxGeometry(0.6,1,0.4),
+      new THREE.MeshLambertMaterial({color})
+    );
+    const head = new THREE.Mesh(
+      new THREE.BoxGeometry(0.5,0.5,0.5),
+      new THREE.MeshLambertMaterial({color})
+    );
+    head.position.y = 0.75;
+    const eye1 = new THREE.Mesh(
+      new THREE.BoxGeometry(0.1,0.1,0.05),
+      new THREE.MeshLambertMaterial({color:0xff0000})
+    );
+    const eye2 = eye1.clone();
+    eye1.position.set(-0.15, 0.8, 0.26);
+    eye2.position.set(0.15, 0.8, 0.26);
+    g.add(body,head,eye1,eye2);
+    g.position.set(x,y,z);
+    gameScene.add(g);
+    const e = {mesh:g,x,y,z,hp:30,type,speed:0.02+Math.random()*0.02,angle:Math.random()*Math.PI*2,alive:true};
+    enemies.push(e);
+    return e;
+  }
+
+  function makeCollectible(x,y,z,type,color) {
+    const m = new THREE.Mesh(
+      type==='coin' ? new THREE.CylinderGeometry(0.2,0.2,0.05,16) : new THREE.OctahedronGeometry(0.25),
+      new THREE.MeshLambertMaterial({color})
+    );
+    m.position.set(x,y,z);
+    gameScene.add(m);
+    collectibles.push({mesh:m,x,y,z,type,collected:false});
+    return m;
+  }
+
+  if(CAT === 'obby') {
+    // OBBY WORLD - floating platforms in the sky
+    gameScene.fog = new THREE.Fog(0x87CEEB, 20, 80);
+    // Start platform
+    makePlatform(0,-0.5,5, 6,0.5,6, 0x4CAF50);
+    // Tower platforms - winding upward
+    const colors = [0xFF5722,0x2196F3,0x9C27B0,0xFF9800,0x00BCD4,0x8BC34A,0xF44336,0xE91E63];
+    let lastX=0,lastZ=0,lastY=0;
+    for(let i=0;i<25;i++) {
+      const dx = (Math.random()-0.5)*6;
+      const dz = -3 - Math.random()*3;
+      const dy = 1.5 + Math.random()*1;
+      lastX+=dx; lastZ+=dz; lastY+=dy;
+      const sz = 1.5+Math.random()*2;
+      const p = makePlatform(lastX,lastY,lastZ, sz,0.4,sz, colors[i%colors.length]);
+      // Moving platforms
+      if(i%4===0) p._move = {axis:'x',range:2,speed:0.8,offset:Math.random()*Math.PI*2};
+      if(i===24) {
+        // Finish flag
+        const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,3,8),
+          new THREE.MeshLambertMaterial({color:0xffffff}));
+        pole.position.set(lastX,lastY+1.5,lastZ);
+        gameScene.add(pole);
+        const flag = new THREE.Mesh(new THREE.BoxGeometry(0.8,0.5,0.05),
+          new THREE.MeshLambertMaterial({color:0xFFD700}));
+        flag.position.set(lastX+0.4,lastY+2.7,lastZ);
+        gameScene.add(flag);
+      }
+    }
+    // Coin collectibles
+    for(let i=0;i<15;i++) makeCollectible((Math.random()-0.5)*20,2+Math.random()*20,(Math.random()-0.5)*30,'coin',0xFFD700);
+    // Player spawn
+    player.x=0; player.y=2; player.z=5;
+
+  } else if(CAT === 'fps') {
+    // FPS ARENA
+    gameScene.background = new THREE.Color(0x0a0a1a);
+    gameScene.fog = new THREE.Fog(0x0a0a1a, 20, 60);
+    // Floor
+    const floorMat = new THREE.MeshLambertMaterial({color:0x1a1a2a});
+    makePlatform(0,-0.5,0, 60,0.5,60, 0, floorMat);
+    // Walls
+    makePlatform(0,5,-30, 60,12,0.5, 0x2a2a3a);
+    makePlatform(0,5,30, 60,12,0.5, 0x2a2a3a);
+    makePlatform(-30,5,0, 0.5,12,60, 0x2a2a3a);
+    makePlatform(30,5,0, 0.5,12,60, 0x2a2a3a);
+    // Cover boxes
+    const boxMat = new THREE.MeshLambertMaterial({color:0x3a3a4a});
+    [[5,0.5,0],[- 5,0.5,0],[0,0.5,8],[-8,0.5,-5],[8,0.5,-5],[0,0.5,-10],[12,0.5,5],[-12,0.5,5]].forEach(([x,y,z]) => {
+      makePlatform(x,y,z,1.5,1.2,1.5,0,boxMat);
+    });
+    // Elevated platforms
+    makePlatform(0,2,-15,8,0.3,4,0x2a3a4a);
+    makePlatform(-15,2,0,4,0.3,8,0x2a3a4a);
+    makePlatform(15,2,0,4,0.3,8,0x2a3a4a);
+    // Enemy spawners
+    [[-10,1,-10],[10,1,-10],[0,1,-20],[-15,1,10],[15,1,10],[-5,3,-14],[5,3,-14]].forEach(([x,y,z]) => {
+      makeEnemy(x,y+0.5,z,'soldier',0x4169E1);
+    });
+    player.x=0; player.y=1.6; player.z=15;
+
+  } else if(CAT === 'adventure') {
+    // OPEN WORLD ADVENTURE
+    gameScene.background = new THREE.Color(0x70B8FF);
+    gameScene.fog = new THREE.Fog(0xA0D0FF, 40, 120);
+    // Terrain
+    const terrainGeo = new THREE.PlaneGeometry(100,100,20,20);
+    const pos = terrainGeo.attributes.position;
+    for(let i=0;i<pos.count;i++) {
+      const x = pos.getX(i), z = pos.getZ(i);
+      pos.setY(i, Math.sin(x*0.2)*1.5 + Math.cos(z*0.15)*1.2 + Math.sin((x+z)*0.1)*0.8);
+    }
+    terrainGeo.computeVertexNormals();
+    const terrain = new THREE.Mesh(terrainGeo, new THREE.MeshLambertMaterial({color:0x3D9E3D}));
+    terrain.rotation.x = -Math.PI/2;
+    terrain.receiveShadow = true;
+    gameScene.add(terrain);
+    platforms.push({mesh:terrain, x:0,y:0,z:0,w:100,h:0.1,d:100,flat:true});
+    // Water
+    const water = new THREE.Mesh(new THREE.PlaneGeometry(200,200),
+      new THREE.MeshLambertMaterial({color:0x1E90FF,transparent:true,opacity:0.7}));
+    water.rotation.x = -Math.PI/2;
+    water.position.y = -0.5;
+    gameScene.add(water);
+    // Trees
+    for(let i=0;i<40;i++) {
+      const g = new THREE.Group();
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.2,2,8),
+        new THREE.MeshLambertMaterial({color:0x8B4513}));
+      const leaves = new THREE.Mesh(new THREE.SphereGeometry(1+Math.random(),8,6),
+        new THREE.MeshLambertMaterial({color:new THREE.Color().setHSL(0.3+Math.random()*0.1,0.8,0.35)}));
+      leaves.position.y = 2;
+      g.add(trunk,leaves); g.castShadow=true;
+      g.position.set((Math.random()-0.5)*60, 0, (Math.random()-0.5)*60 - 10);
+      gameScene.add(g);
+    }
+    // Mountains
+    for(let i=0;i<8;i++) {
+      const m = new THREE.Mesh(new THREE.ConeGeometry(4+Math.random()*4, 10+Math.random()*8, 8),
+        new THREE.MeshLambertMaterial({color:0x808080}));
+      m.position.set((Math.random()-0.5)*80, 5, -30 - Math.random()*30);
+      m.castShadow = true;
+      gameScene.add(m);
+    }
+    // Collectibles
+    for(let i=0;i<20;i++) makeCollectible((Math.random()-0.5)*40, 2+Math.random()*3, (Math.random()-0.5)*40-5,'gem', new THREE.Color().setHSL(Math.random(),1,.6).getHex());
+    // Enemies
+    for(let i=0;i<8;i++) makeEnemy((Math.random()-0.5)*30, 1, (Math.random()-0.5)*30-10,'monster',0x8B0000);
+    player.x=0; player.y=3; player.z=15;
+
+  } else if(CAT === 'roleplay') {
+    // CITY / TOWN
+    gameScene.background = new THREE.Color(0x87CEEB);
+    gameScene.fog = new THREE.Fog(0xC8E8FF, 40, 120);
+    // Ground
+    makePlatform(0,-0.5,0, 120,0.5,120, 0x808080);
+    // Roads
+    makePlatform(0,-0.48,0, 8,0.1,120, 0x303030);
+    makePlatform(0,-0.48,0, 120,0.1,8, 0x303030);
+    // Buildings
+    const bColors = [0xE8D5B7,0xC8B89A,0xA8987A,0xD4C4A0,0xB8A880,0xF0E8D0];
+    for(let i=0;i<20;i++) {
+      const h = 3+Math.random()*8;
+      const x = (Math.floor(Math.random()*4)-2)*15 + 5;
+      const z = (Math.floor(Math.random()*4)-2)*15 - 5;
+      if(Math.abs(x)<6 && Math.abs(z)<6) continue;
+      const b = makePlatform(x,h/2-0.5,z, 4+Math.random()*4,h,4+Math.random()*4, bColors[i%bColors.length]);
+      // Windows
+      for(let w=0;w<3;w++) for(let fl=0;fl<Math.floor(h/2);fl++) {
+        const win = new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.05),
+          new THREE.MeshLambertMaterial({color:Math.random()>0.3?0xFFFF88:0x334455}));
+        win.position.set(x+(w-1)*1.2, fl*1.8+0.5, z+2.1);
+        gameScene.add(win);
+      }
+    }
+    // Trees
+    for(let i=0;i<15;i++) {
+      const g = new THREE.Group();
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.15,1.5,8),
+        new THREE.MeshLambertMaterial({color:0x8B4513}));
+      const leaves = new THREE.Mesh(new THREE.SphereGeometry(0.8,8,6),
+        new THREE.MeshLambertMaterial({color:0x228B22}));
+      leaves.position.y = 1.3; g.add(trunk,leaves);
+      g.position.set((Math.random()-0.5)*50, 0, (Math.random()-0.5)*50);
+      gameScene.add(g);
+    }
+    // Collectibles (coins on streets)
+    for(let i=0;i<15;i++) makeCollectible((Math.random()-0.5)*30, 0.4, (Math.random()-0.5)*30,'coin',0xFFD700);
+    player.x=0; player.y=1.6; player.z=20;
+
+  } else if(CAT === 'simulator') {
+    // PET/SIMULATOR WORLD
+    gameScene.background = new THREE.Color(0xFFB6C1);
+    gameScene.fog = new THREE.Fog(0xFFB6C1, 30, 80);
+    makePlatform(0,-0.5,0, 60,0.5,60, 0x90EE90);
+    // Rainbow arch
+    for(let i=0;i<7;i++) {
+      const arc = new THREE.Mesh(new THREE.TorusGeometry(8+i*0.5,0.3,8,32,Math.PI),
+        new THREE.MeshLambertMaterial({color:new THREE.Color().setHSL(i/7,1,.6)}));
+      arc.position.set(0,6,0); arc.rotation.z = Math.PI/2;
+      gameScene.add(arc);
+    }
+    // Candy trees
+    for(let i=0;i<12;i++) {
+      const g = new THREE.Group();
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.15,2,8),
+        new THREE.MeshLambertMaterial({color:0xFF69B4}));
+      const top = new THREE.Mesh(new THREE.SphereGeometry(0.8+Math.random()*0.4,8,6),
+        new THREE.MeshLambertMaterial({color:new THREE.Color().setHSL(Math.random(),1,.7)}));
+      top.position.y=2; g.add(trunk,top);
+      g.position.set((Math.random()-0.5)*40, 0.5, (Math.random()-0.5)*40);
+      gameScene.add(g);
+    }
+    // LOTS of collectibles
+    for(let i=0;i<30;i++) makeCollectible((Math.random()-0.5)*35, 0.5+Math.random()*2, (Math.random()-0.5)*35,'gem',new THREE.Color().setHSL(Math.random(),1,.6).getHex());
+    // Cute enemies (non-threatening blobs)
+    for(let i=0;i<10;i++) makeEnemy((Math.random()-0.5)*25, 0.5, (Math.random()-0.5)*25,'blob',new THREE.Color().setHSL(Math.random(),0.8,0.5).getHex());
+    player.x=0; player.y=1.6; player.z=15;
+
+  } else {
+    // DEFAULT / ACTION
+    gameScene.background = new THREE.Color(0x1a1a2e);
+    gameScene.fog = new THREE.Fog(0x1a1a2e, 30, 100);
+    makePlatform(0,-0.5,0, 80,0.5,80, 0x1a1a3a);
+    for(let i=0;i<30;i++) {
+      makePlatform((Math.random()-0.5)*40, Math.random()*5, (Math.random()-0.5)*40,
+        2+Math.random()*4, 0.4, 2+Math.random()*4, new THREE.Color(game.gradient[i%3]).getHex());
+    }
+    for(let i=0;i<12;i++) makeEnemy((Math.random()-0.5)*30, 1, (Math.random()-0.5)*30-5,'basic',0xFF4444);
+    for(let i=0;i<20;i++) makeCollectible((Math.random()-0.5)*35, 1+Math.random()*3, (Math.random()-0.5)*35,'coin',0xFFD700);
+    player.x=0; player.y=2; player.z=15;
+  }
+}
+
+// =========================================================
+//  GAME LOOP
+// =========================================================
+const GRAVITY = -20;
+const JUMP_V = 8;
+const SPEED = 8;
+
+function gameLoop() {
+  animFrameId = requestAnimationFrame(gameLoop);
+  const dt = Math.min(gameClock.getDelta(), 0.05);
+  const t = gameClock.getElapsedTime ? performance.now()/1000 : 0;
+
+  if(player.health <= 0) {
+    showMsg('💀 You Died!', 'Press R to respawn', 0);
+    if(keys['KeyR']) respawn();
+    gameRenderer.render(gameScene, gameCamera);
+    return;
+  }
+
+  // MOVEMENT
+  const fwd = new THREE.Vector3(Math.sin(player.yaw), 0, Math.cos(player.yaw));
+  const right = new THREE.Vector3(Math.cos(player.yaw), 0, -Math.sin(player.yaw));
+
+  let moveX = 0, moveZ = 0;
+  if(keys['KeyW']||keys['ArrowUp']) { moveX -= fwd.x; moveZ -= fwd.z; }
+  if(keys['KeyS']||keys['ArrowDown']) { moveX += fwd.x; moveZ += fwd.z; }
+  if(keys['KeyA']||keys['ArrowLeft']) { moveX -= right.x; moveZ -= right.z; }
+  if(keys['KeyD']||keys['ArrowRight']) { moveX += right.x; moveZ += right.z; }
+
+  const len = Math.sqrt(moveX*moveX+moveZ*moveZ);
+  if(len>0) { moveX/=len; moveZ/=len; }
+  player.x += moveX * SPEED * dt;
+  player.z += moveZ * SPEED * dt;
+
+  // Jump
+  if((keys['Space']||keys['KeyF']) && player.onGround) {
+    player.vy = JUMP_V;
+    player.onGround = false;
+  }
+
+  // Gravity
+  player.vy += GRAVITY * dt;
+  player.y += player.vy * dt;
+
+  // Collision with platforms
+  player.onGround = false;
+  platforms.forEach(p => {
+    if(p.flat) {
+      // Terrain
+      if(player.y < 1.8 && player.y > -5) {
+        player.y = Math.max(player.y, 1.6);
+        if(player.y <= 1.6) { player.vy = 0; player.onGround = true; }
+      }
+    } else {
+      const hw=p.w/2+0.3, hd=p.d/2+0.3;
+      const top = p.y + p.h/2;
+      const px=player.x, pz=player.z, py=player.y;
+      if(px>p.x-hw&&px<p.x+hw && pz>p.z-hd&&pz<p.z+hd) {
+        if(py>top-0.5&&py<top+2&&player.vy<=0) {
+          player.y = top+1.6; player.vy=0; player.onGround=true;
         }
+      }
+    }
+  });
 
-        function loop() {
-            let speed = isInCar ? 15 : 7;
-            
-            if(keys['KeyW']) py += speed;
-            if(keys['KeyS']) py -= speed;
-            if(keys['KeyA']) px += speed;
-            if(keys['KeyD']) px -= speed;
+  // Fall death
+  if(player.y < -20) {
+    player.health -= 25;
+    document.getElementById('health-fill').style.width = Math.max(0,player.health)+'%';
+    respawn();
+  }
 
-            // FIRST PERSON CAMERA LOGIC
-            // This moves the world towards you to simulate walking
-            world.style.transform = `rotateX(0deg) translateY(${py}px) translateX(${px}px) translateZ(500px)`;
-            
-            // Sync car position if driving
-            if(isInCar) {
-                car.style.transform = `translate(-50%, -50%) translate3d(0, 0, -100px) rotateX(90deg)`;
-            }
+  // Update camera
+  gameCamera.position.set(player.x, player.y, player.z);
+  gameCamera.rotation.order = 'YXZ';
+  gameCamera.rotation.y = player.yaw;
+  gameCamera.rotation.x = player.pitch;
 
-            requestAnimationFrame(loop);
+  // ENEMY AI
+  enemies.forEach(e => {
+    if(!e.alive) return;
+    const dx = player.x - e.x;
+    const dz = player.z - e.z;
+    const dist = Math.sqrt(dx*dx+dz*dz);
+    e.mesh.rotation.y = Math.atan2(dx, dz);
+    // Move toward player
+    if(dist < 20) {
+      e.x += (dx/dist)*e.speed*dt*60;
+      e.z += (dz/dist)*e.speed*dt*60;
+      e.mesh.position.x = e.x;
+      e.mesh.position.z = e.z;
+    } else {
+      e.angle += 0.02;
+      e.x += Math.sin(e.angle)*e.speed*dt*30;
+      e.z += Math.cos(e.angle)*e.speed*dt*30;
+      e.mesh.position.x = e.x;
+      e.mesh.position.z = e.z;
+    }
+    // Damage player
+    if(dist < 1.2) {
+      player.health -= 5*dt;
+      document.getElementById('health-fill').style.width = Math.max(0,player.health)+'%';
+    }
+    // Bob animation
+    e.mesh.position.y = e.y + Math.sin(performance.now()/300+e.angle)*0.1;
+  });
+
+  // COLLECTIBLES
+  collectibles.forEach(c => {
+    if(c.collected) return;
+    c.mesh.rotation.y += dt * 2;
+    c.mesh.position.y += Math.sin(performance.now()/400+c.x)*0.003;
+    const dx=player.x-c.x, dz=player.z-c.z, dy=player.y-c.y;
+    if(Math.sqrt(dx*dx+dz*dz+dy*dy) < 1.2) {
+      c.collected = true;
+      c.mesh.visible = false;
+      score += c.type === 'gem' ? 50 : 10;
+      document.getElementById('score-val').textContent = score;
+    }
+  });
+
+  // MOVING PLATFORMS
+  platforms.forEach(p => {
+    if(p.mesh._move) {
+      const mv = p.mesh._move;
+      const t2 = performance.now()/1000;
+      if(mv.axis==='x') {
+        p.mesh.position.x = p.x + Math.sin(t2*mv.speed+mv.offset)*mv.range;
+        p.x = p.mesh.position.x;
+      }
+    }
+  });
+
+  // MINIMAP
+  drawMinimap();
+
+  gameRenderer.render(gameScene, gameCamera);
+}
+
+function onMouseMove(e) {
+  if(!mouseLocked) return;
+  player.yaw -= e.movementX * 0.002;
+  player.pitch -= e.movementY * 0.002;
+  player.pitch = Math.max(-Math.PI/2.5, Math.min(Math.PI/2.5, player.pitch));
+}
+
+function onShoot(e) {
+  if(!mouseLocked || gameType !== 'fps' && gameType !== 'action') return;
+  // Raycast
+  const raycaster = new THREE.Raycaster();
+  raycaster.setFromCamera(new THREE.Vector2(0,0), gameCamera);
+  const meshes = enemies.filter(en=>en.alive).map(en=>en.mesh);
+  const allMeshes = [];
+  meshes.forEach(m => m.traverse(c=>{if(c.isMesh)allMeshes.push(c)}));
+  const hits = raycaster.intersectObjects(allMeshes, false);
+  if(hits.length > 0) {
+    const hit = hits[0];
+    enemies.forEach(en => {
+      if(!en.alive) return;
+      en.mesh.traverse(c=>{if(c === hit.object){
+        en.hp -= 20;
+        if(en.hp <= 0) {
+          en.alive=false;
+          en.mesh.visible=false;
+          score += 100;
+          document.getElementById('score-val').textContent = score;
         }
-        loop();
-    </script>
+      }});
+    });
+    // Muzzle flash
+    const flash = new THREE.PointLight(0xFFAA00, 3, 5);
+    flash.position.copy(gameCamera.position);
+    gameScene.add(flash);
+    setTimeout(()=>gameScene.remove(flash),50);
+  }
+}
+
+function respawn() {
+  player.y = 5; player.vy = 0;
+  const start = {x:0,z:5};
+  player.x=start.x; player.z=start.z;
+}
+
+function showMsg(title, sub, timeout) {
+  const el = document.getElementById('game-msg');
+  el.innerHTML = `<div>${title}</div>${sub?`<div style="font-size:14px;color:var(--text2);margin-top:8px;font-weight:600">${sub}</div>`:''}`;
+  el.style.display='block';
+  if(timeout>0) setTimeout(()=>el.style.display='none', timeout);
+}
+
+function updateHUD() {
+  const hud = document.getElementById('hud-stats');
+  hud.innerHTML = `<span>📍 ${activeGame?.title||''}</span><span>👥 ${activeGame?.players||''} online</span>`;
+}
+
+function drawMinimap() {
+  const mm = document.getElementById('minimap');
+  if(!mm) return;
+  const ctx = mm.getContext('2d');
+  mm.width=100; mm.height=100;
+  ctx.fillStyle='rgba(0,0,0,0.7)';
+  ctx.fillRect(0,0,100,100);
+  const scale = 2;
+  const ox = 50 - player.x/scale;
+  const oy = 50 - player.z/scale;
+  platforms.slice(0,30).forEach(p => {
+    if(p.flat) return;
+    ctx.fillStyle='#445566';
+    ctx.fillRect(ox+p.x/scale-p.w/(2*scale),oy+p.z/scale-p.d/(2*scale),p.w/scale,p.d/scale);
+  });
+  enemies.forEach(e => {
+    if(!e.alive) return;
+    ctx.fillStyle='#ff4444';
+    ctx.beginPath();
+    ctx.arc(ox+e.x/scale, oy+e.z/scale, 2, 0, Math.PI*2);
+    ctx.fill();
+  });
+  collectibles.forEach(c => {
+    if(c.collected) return;
+    ctx.fillStyle='#FFD700';
+    ctx.beginPath();
+    ctx.arc(ox+c.x/scale, oy+c.z/scale, 1.5, 0, Math.PI*2);
+    ctx.fill();
+  });
+  // Player dot
+  ctx.fillStyle='#00A2FF';
+  ctx.beginPath();
+  ctx.arc(50,50,4,0,Math.PI*2);
+  ctx.fill();
+  // Direction
+  ctx.strokeStyle='#00A2FF';
+  ctx.lineWidth=1.5;
+  ctx.beginPath();
+  ctx.moveTo(50,50);
+  ctx.lineTo(50+Math.sin(-player.yaw)*12, 50+Math.cos(-player.yaw)*12);
+  ctx.stroke();
+}
+
+// =========================================================
+//  INIT
+// =========================================================
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loading-screen').classList.add('hidden');
+    setTimeout(() => document.getElementById('loading-screen').remove(), 500);
+  }, 1600);
+
+  populateHome();
+});
+
+// Prevent arrow key page scroll
+window.addEventListener('keydown', e => {
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code) &&
+     document.getElementById('launcher').classList.contains('open')) {
+    e.preventDefault();
+  }
+});
+</script>
 </body>
 </html>
