@@ -1,4 +1,4 @@
-/* ROBLOX REPLICA - EXACT MATCH */
+/* ROBLOX EXACT REPLICA */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap');
 
 * {
@@ -124,7 +124,7 @@ body {
   color: #FFFFFF;
 }
 
-/* GAMES GRID - EXACT ROBLOX LAYOUT */
+/* GAMES GRID */
 .games-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -243,6 +243,7 @@ body {
   justify-content: space-between;
   align-items: center;
   z-index: 10000;
+  backdrop-filter: blur(10px);
 }
 
 .game-title {
@@ -259,6 +260,11 @@ body {
   font-weight: 700;
   cursor: pointer;
   font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+}
+
+.close-btn:hover {
+  background-color: #FF6666;
 }
 
 .game-canvas {
