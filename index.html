@@ -51,10 +51,10 @@
         </div>
     </nav>
 
-    <!-- 15 Game Grid -->
+    <!-- 15 Games Grid -->
     <div class="games-grid" id="gamesGrid"></div>
 
-    <!-- Game Modal (Fullscreen Playable Game) -->
+    <!-- Game Modal -->
     <div class="game-modal" id="gameModal">
         <div class="game-header">
             <h2 class="game-title" id="modalGameTitle">Game Title</h2>
@@ -64,120 +64,26 @@
     </div>
 
     <script>
-        // ================================
-        // 15 PLAYABLE GAMES DATA
-        // ================================
+        // 15 DIFFERENT GAME TYPES
         const games = [
-            {
-                title: "Obby Paradise",
-                thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=225&fit=crop",
-                likePercentage: 94,
-                playerCount: "487K",
-                gameType: "platformer"
-            },
-            {
-                title: "Coin Collector",
-                thumbnail: "https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=400&h=225&fit=crop",
-                likePercentage: 91,
-                playerCount: "356K",
-                gameType: "collector"
-            },
-            {
-                title: "Speed Run Tower",
-                thumbnail: "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=400&h=225&fit=crop",
-                likePercentage: 96,
-                playerCount: "523K",
-                gameType: "platformer"
-            },
-            {
-                title: "Rainbow Jumper",
-                thumbnail: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=400&h=225&fit=crop",
-                likePercentage: 89,
-                playerCount: "167K",
-                gameType: "platformer"
-            },
-            {
-                title: "Mega Jump Arena",
-                thumbnail: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=400&h=225&fit=crop",
-                likePercentage: 93,
-                playerCount: "276K",
-                gameType: "platformer"
-            },
-            {
-                title: "Sky Island Hop",
-                thumbnail: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=225&fit=crop",
-                likePercentage: 90,
-                playerCount: "189K",
-                gameType: "platformer"
-            },
-            {
-                title: "Crystal Quest",
-                thumbnail: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=225&fit=crop",
-                likePercentage: 87,
-                playerCount: "412K",
-                gameType: "collector"
-            },
-            {
-                title: "Neon Parkour",
-                thumbnail: "https://images.unsplash.com/photo-1560253023-3ec5d502959f?w=400&h=225&fit=crop",
-                likePercentage: 91,
-                playerCount: "124K",
-                gameType: "platformer"
-            },
-            {
-                title: "Block Runner 3D",
-                thumbnail: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=225&fit=crop",
-                likePercentage: 88,
-                playerCount: "156K",
-                gameType: "platformer"
-            },
-            {
-                title: "Jump Challenge",
-                thumbnail: "https://images.unsplash.com/photo-1551244072-5d12893278ab?w=400&h=225&fit=crop",
-                likePercentage: 86,
-                playerCount: "98.5K",
-                gameType: "platformer"
-            },
-            {
-                title: "Gravity Flip",
-                thumbnail: "https://images.unsplash.com/photo-1613376023733-0a73315d9b06?w=400&h=225&fit=crop",
-                likePercentage: 89,
-                playerCount: "203K",
-                gameType: "platformer"
-            },
-            {
-                title: "Cloud Climber",
-                thumbnail: "https://images.unsplash.com/photo-1527482797697-8795b05a13fe?w=400&h=225&fit=crop",
-                likePercentage: 92,
-                playerCount: "134K",
-                gameType: "platformer"
-            },
-            {
-                title: "Treasure Hunter",
-                thumbnail: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=225&fit=crop",
-                likePercentage: 88,
-                playerCount: "215K",
-                gameType: "collector"
-            },
-            {
-                title: "Platform Master",
-                thumbnail: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&h=225&fit=crop",
-                likePercentage: 95,
-                playerCount: "389K",
-                gameType: "platformer"
-            },
-            {
-                title: "Endless Runner",
-                thumbnail: "https://images.unsplash.com/photo-1616628188859-7a11abb6fcc9?w=400&h=225&fit=crop",
-                likePercentage: 90,
-                playerCount: "298K",
-                gameType: "platformer"
-            }
+            { title: "Brookhaven RP", thumbnail: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=225&fit=crop", likePercentage: 90, playerCount: "189K", gameType: "roleplay" },
+            { title: "Arsenal Shooter", thumbnail: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=225&fit=crop", likePercentage: 91, playerCount: "124K", gameType: "shooter" },
+            { title: "Speed Racing", thumbnail: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=400&h=225&fit=crop", likePercentage: 89, playerCount: "167K", gameType: "racing" },
+            { title: "Pet Simulator", thumbnail: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&h=225&fit=crop", likePercentage: 87, playerCount: "412K", gameType: "simulator" },
+            { title: "Tower Obby", thumbnail: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=225&fit=crop", likePercentage: 88, playerCount: "234K", gameType: "platformer" },
+            { title: "Murder Mystery", thumbnail: "https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=400&h=225&fit=crop", likePercentage: 92, playerCount: "198K", gameType: "mystery" },
+            { title: "Blox Fruits", thumbnail: "https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=400&h=225&fit=crop", likePercentage: 96, playerCount: "523K", gameType: "adventure" },
+            { title: "Jailbreak", thumbnail: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=400&h=225&fit=crop", likePercentage: 89, playerCount: "167K", gameType: "action" },
+            { title: "Adopt Me!", thumbnail: "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&h=225&fit=crop", likePercentage: 91, playerCount: "356K", gameType: "roleplay" },
+            { title: "Piggy Horror", thumbnail: "https://images.unsplash.com/photo-1616628188859-7a11abb6fcc9?w=400&h=225&fit=crop", likePercentage: 93, playerCount: "276K", gameType: "horror" },
+            { title: "Mega Jump", thumbnail: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=400&h=225&fit=crop", likePercentage: 85, playerCount: "143K", gameType: "platformer" },
+            { title: "Survival Island", thumbnail: "https://images.unsplash.com/photo-1527482797697-8795b05a13fe?w=400&h=225&fit=crop", likePercentage: 92, playerCount: "134K", gameType: "survival" },
+            { title: "Coin Collector", thumbnail: "https://images.unsplash.com/photo-1560253023-3ec5d502959f?w=400&h=225&fit=crop", likePercentage: 86, playerCount: "98.5K", gameType: "collector" },
+            { title: "Fighting Arena", thumbnail: "https://images.unsplash.com/photo-1613376023733-0a73315d9b06?w=400&h=225&fit=crop", likePercentage: 89, playerCount: "203K", gameType: "fighting" },
+            { title: "Build Battle", thumbnail: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=225&fit=crop", likePercentage: 88, playerCount: "156K", gameType: "building" }
         ];
 
-        // ================================
-        // RENDER GAME CARDS
-        // ================================
+        // Render game cards
         function renderGames() {
             const grid = document.getElementById('gamesGrid');
             grid.innerHTML = games.map((game, index) => `
@@ -208,21 +114,15 @@
             lucide.createIcons();
         }
 
-        // ================================
-        // PLAY GAME (OPEN FULLSCREEN)
-        // ================================
-        let currentGame = null;
-        let scene, camera, renderer, player, platforms = [], coins = [], keys = {};
-        let playerVelocity, isGrounded = false, score = 0;
+        // GAME ENGINE VARIABLES
+        let currentGame, scene, camera, renderer, player, objects = [], keys = {}, animationId;
+        let playerVelocity, isGrounded, score = 0, gameObjects = [];
 
         function playGame(index) {
-            const game = games[index];
-            currentGame = game;
-            
-            document.getElementById('modalGameTitle').textContent = game.title;
+            currentGame = games[index];
+            document.getElementById('modalGameTitle').textContent = currentGame.title;
             document.getElementById('gameModal').classList.add('active');
-            
-            initGame(game.gameType);
+            initGame(currentGame.gameType);
         }
 
         function closeGame() {
@@ -233,22 +133,14 @@
                 scene.clear();
             }
             keys = {};
+            objects = [];
+            gameObjects = [];
         }
 
-        // ================================
-        // 3D GAME ENGINE
-        // ================================
-        let animationId;
-
-        function initGame(gameType) {
+        function initGame(type) {
             const canvas = document.getElementById('gameCanvas');
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x87CEEB);
-            scene.fog = new THREE.Fog(0x87CEEB, 10, 100);
-
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(0, 5, 10);
-
             renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.shadowMap.enabled = true;
@@ -256,30 +148,268 @@
             // Lighting
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
             scene.add(ambientLight);
-
             const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
             directionalLight.position.set(10, 20, 10);
             directionalLight.castShadow = true;
             scene.add(directionalLight);
 
-            // Create Player
-            createPlayer();
+            // Setup game based on type
+            switch(type) {
+                case 'roleplay': setupRoleplayGame(); break;
+                case 'shooter': setupShooterGame(); break;
+                case 'racing': setupRacingGame(); break;
+                case 'simulator': setupSimulatorGame(); break;
+                case 'platformer': setupPlatformerGame(); break;
+                case 'mystery': setupMysteryGame(); break;
+                case 'adventure': setupAdventureGame(); break;
+                case 'action': setupActionGame(); break;
+                case 'horror': setupHorrorGame(); break;
+                case 'survival': setupSurvivalGame(); break;
+                case 'collector': setupCollectorGame(); break;
+                case 'fighting': setupFightingGame(); break;
+                case 'building': setupBuildingGame(); break;
+                default: setupPlatformerGame();
+            }
 
-            // Create Level
-            createLevel(gameType);
-
-            // Event Listeners
             document.addEventListener('keydown', (e) => keys[e.code] = true);
             document.addEventListener('keyup', (e) => keys[e.code] = false);
-
-            // Start Game Loop
             animate();
         }
 
+        // ROLEPLAY GAME (walk around town)
+        function setupRoleplayGame() {
+            scene.background = new THREE.Color(0x87CEEB);
+            camera.position.set(0, 5, 10);
+            createPlayer();
+            
+            // Town buildings
+            for(let i = 0; i < 10; i++) {
+                const x = (Math.random() - 0.5) * 40;
+                const z = (Math.random() - 0.5) * 40;
+                createBuilding(x, z, Math.random() * 0xffffff);
+            }
+            createGround(0, -1, 50, 1, 50, 0x228B22);
+        }
+
+        // SHOOTER GAME (shoot targets)
+        function setupShooterGame() {
+            scene.background = new THREE.Color(0x333333);
+            scene.fog = new THREE.Fog(0x333333, 10, 50);
+            camera.position.set(0, 2, 10);
+            createPlayer();
+            
+            // Targets
+            for(let i = 0; i < 15; i++) {
+                const target = createTarget(
+                    (Math.random() - 0.5) * 30,
+                    Math.random() * 3 + 1,
+                    -10 - Math.random() * 20
+                );
+                gameObjects.push(target);
+            }
+            createGround(0, 0, 50, 0.1, 50, 0x444444);
+        }
+
+        // RACING GAME (drive car on track)
+        function setupRacingGame() {
+            scene.background = new THREE.Color(0x87CEEB);
+            camera.position.set(0, 10, 20);
+            
+            // Create car
+            const carBody = new THREE.Mesh(
+                new THREE.BoxGeometry(2, 1, 4),
+                new THREE.MeshPhongMaterial({ color: 0xFF0000 })
+            );
+            carBody.position.set(0, 1, 0);
+            carBody.castShadow = true;
+            scene.add(carBody);
+            player = carBody;
+            playerVelocity = new THREE.Vector3(0, 0, 0);
+            
+            // Race track
+            createRaceTrack();
+        }
+
+        // SIMULATOR GAME (collect pets)
+        function setupSimulatorGame() {
+            scene.background = new THREE.Color(0xFFB6C1);
+            camera.position.set(0, 5, 10);
+            createPlayer();
+            
+            // Pets to collect
+            for(let i = 0; i < 20; i++) {
+                const pet = createPet(
+                    (Math.random() - 0.5) * 30,
+                    1,
+                    (Math.random() - 0.5) * 30
+                );
+                gameObjects.push(pet);
+            }
+            createGround(0, 0, 40, 0.1, 40, 0x90EE90);
+        }
+
+        // PLATFORMER GAME (jump platforms)
+        function setupPlatformerGame() {
+            scene.background = new THREE.Color(0x87CEEB);
+            camera.position.set(0, 5, 10);
+            createPlayer();
+            playerVelocity = new THREE.Vector3(0, 0, 0);
+            isGrounded = false;
+            
+            createGround(0, -1, 20, 1, 20, 0x2ECC71);
+            const colors = [0xE74C3C, 0xF39C12, 0x9B59B6, 0x3498DB, 0xE67E22, 0x1ABC9C, 0xFF69B4, 0xFFD700];
+            for (let i = 0; i < 8; i++) {
+                const x = (i % 2 === 0) ? 5 : -5;
+                const z = -5 - (i * 5);
+                const y = 1 + i;
+                createPlatform(x, y, z, 4, 0.5, 4, colors[i]);
+                createCoin(x, y + 2, z);
+            }
+        }
+
+        // MYSTERY GAME (find clues)
+        function setupMysteryGame() {
+            scene.background = new THREE.Color(0x1a1a2e);
+            camera.position.set(0, 5, 10);
+            createPlayer();
+            
+            // Clues (glowing orbs)
+            for(let i = 0; i < 10; i++) {
+                const clue = createClue(
+                    (Math.random() - 0.5) * 30,
+                    1,
+                    (Math.random() - 0.5) * 30
+                );
+                gameObjects.push(clue);
+            }
+            createGround(0, 0, 40, 0.1, 40, 0x0f3460);
+        }
+
+        // ADVENTURE GAME (explore islands)
+        function setupAdventureGame() {
+            scene.background = new THREE.Color(0x87CEEB);
+            camera.position.set(0, 10, 15);
+            createPlayer();
+            
+            // Islands
+            for(let i = 0; i < 5; i++) {
+                createIsland(
+                    (Math.random() - 0.5) * 40,
+                    0,
+                    -10 - (i * 10)
+                );
+            }
+        }
+
+        // ACTION GAME (dodge obstacles)
+        function setupActionGame() {
+            scene.background = new THREE.Color(0xFF6B6B);
+            camera.position.set(0, 5, 10);
+            createPlayer();
+            
+            // Moving obstacles
+            for(let i = 0; i < 12; i++) {
+                const obstacle = createObstacle(
+                    (Math.random() - 0.5) * 20,
+                    1,
+                    -10 - (i * 3)
+                );
+                gameObjects.push(obstacle);
+            }
+            createGround(0, 0, 30, 0.1, 100, 0x333333);
+        }
+
+        // HORROR GAME (escape maze)
+        function setupHorrorGame() {
+            scene.background = new THREE.Color(0x0a0a0a);
+            scene.fog = new THREE.Fog(0x0a0a0a, 5, 20);
+            camera.position.set(0, 5, 10);
+            createPlayer();
+            
+            // Maze walls
+            for(let i = 0; i < 20; i++) {
+                createWall(
+                    (Math.random() - 0.5) * 30,
+                    1.5,
+                    (Math.random() - 0.5) * 30
+                );
+            }
+            createGround(0, 0, 40, 0.1, 40, 0x1a1a1a);
+        }
+
+        // SURVIVAL GAME (gather resources)
+        function setupSurvivalGame() {
+            scene.background = new THREE.Color(0x87CEEB);
+            camera.position.set(0, 5, 10);
+            createPlayer();
+            
+            // Trees (resources)
+            for(let i = 0; i < 15; i++) {
+                createTree(
+                    (Math.random() - 0.5) * 30,
+                    0,
+                    (Math.random() - 0.5) * 30
+                );
+            }
+            createGround(0, 0, 40, 0.1, 40, 0x3a7d44);
+        }
+
+        // COLLECTOR GAME (collect coins)
+        function setupCollectorGame() {
+            scene.background = new THREE.Color(0xFFD700);
+            camera.position.set(0, 5, 10);
+            createPlayer();
+            
+            // Lots of coins
+            for(let i = 0; i < 30; i++) {
+                createCoin(
+                    (Math.random() - 0.5) * 30,
+                    Math.random() * 3 + 1,
+                    (Math.random() - 0.5) * 30
+                );
+            }
+            createGround(0, 0, 40, 0.1, 40, 0xFFA500);
+        }
+
+        // FIGHTING GAME (combat arena)
+        function setupFightingGame() {
+            scene.background = new THREE.Color(0x8B0000);
+            camera.position.set(0, 5, 10);
+            createPlayer();
+            
+            // Arena
+            createArena();
+            
+            // Enemies
+            for(let i = 0; i < 5; i++) {
+                createEnemy(
+                    (Math.random() - 0.5) * 15,
+                    1,
+                    (Math.random() - 0.5) * 15
+                );
+            }
+        }
+
+        // BUILDING GAME (place blocks)
+        function setupBuildingGame() {
+            scene.background = new THREE.Color(0x87CEEB);
+            camera.position.set(0, 10, 15);
+            createPlayer();
+            createGround(0, 0, 30, 0.1, 30, 0x228B22);
+            
+            // Pre-built structures
+            for(let i = 0; i < 5; i++) {
+                createStructure(
+                    (Math.random() - 0.5) * 20,
+                    0,
+                    (Math.random() - 0.5) * 20
+                );
+            }
+        }
+
+        // HELPER FUNCTIONS TO CREATE OBJECTS
         function createPlayer() {
             const playerGroup = new THREE.Group();
-
-            // Body
             const body = new THREE.Mesh(
                 new THREE.BoxGeometry(1, 1.5, 0.6),
                 new THREE.MeshPhongMaterial({ color: 0x00A2FF })
@@ -287,7 +417,6 @@
             body.castShadow = true;
             playerGroup.add(body);
 
-            // Head
             const head = new THREE.Mesh(
                 new THREE.BoxGeometry(0.8, 0.8, 0.8),
                 new THREE.MeshPhongMaterial({ color: 0xFFD700 })
@@ -296,137 +425,239 @@
             head.castShadow = true;
             playerGroup.add(head);
 
-            // Arms
-            const armGeometry = new THREE.BoxGeometry(0.3, 1.2, 0.3);
-            const armMaterial = new THREE.MeshPhongMaterial({ color: 0xFFD700 });
-            
-            const leftArm = new THREE.Mesh(armGeometry, armMaterial);
-            leftArm.position.set(-0.65, 0, 0);
-            leftArm.castShadow = true;
-            playerGroup.add(leftArm);
-
-            const rightArm = new THREE.Mesh(armGeometry, armMaterial);
-            rightArm.position.set(0.65, 0, 0);
-            rightArm.castShadow = true;
-            playerGroup.add(rightArm);
-
-            // Legs
-            const legGeometry = new THREE.BoxGeometry(0.35, 1, 0.35);
-            const legMaterial = new THREE.MeshPhongMaterial({ color: 0x0080CC });
-            
-            const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
-            leftLeg.position.set(-0.3, -1.25, 0);
-            leftLeg.castShadow = true;
-            playerGroup.add(leftLeg);
-
-            const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
-            rightLeg.position.set(0.3, -1.25, 0);
-            rightLeg.castShadow = true;
-            playerGroup.add(rightLeg);
-
             playerGroup.position.set(0, 3, 0);
             scene.add(playerGroup);
-            
             player = playerGroup;
-            playerVelocity = new THREE.Vector3(0, 0, 0);
+            playerVelocity = playerVelocity || new THREE.Vector3(0, 0, 0);
         }
 
-        function createLevel(type) {
-            platforms = [];
-            coins = [];
-            
-            // Ground
-            createPlatform(0, -1, 0, 20, 1, 20, 0x2ECC71);
-
-            // Platformer levels
-            const colors = [0xE74C3C, 0xF39C12, 0x9B59B6, 0x3498DB, 0xE67E22, 0x1ABC9C, 0xFF69B4, 0xFFD700];
-            
-            for (let i = 0; i < 8; i++) {
-                const x = (i % 2 === 0) ? 5 : -5;
-                const z = -5 - (i * 5);
-                const y = 1 + i;
-                createPlatform(x, y, z, 4, 0.5, 4, colors[i % colors.length]);
-                
-                // Add coins
-                createCoin(x, y + 2, z);
-            }
+        function createGround(x, y, w, h, d, color) {
+            const ground = new THREE.Mesh(
+                new THREE.BoxGeometry(w, h, d),
+                new THREE.MeshPhongMaterial({ color })
+            );
+            ground.position.set(x, y, 0);
+            ground.receiveShadow = true;
+            scene.add(ground);
+            objects.push(ground);
         }
 
         function createPlatform(x, y, z, w, h, d, color) {
-            const geometry = new THREE.BoxGeometry(w, h, d);
-            const material = new THREE.MeshPhongMaterial({ color });
-            const platform = new THREE.Mesh(geometry, material);
+            const platform = new THREE.Mesh(
+                new THREE.BoxGeometry(w, h, d),
+                new THREE.MeshPhongMaterial({ color })
+            );
             platform.position.set(x, y, z);
             platform.castShadow = true;
             platform.receiveShadow = true;
             scene.add(platform);
-            platforms.push(platform);
+            objects.push(platform);
         }
 
         function createCoin(x, y, z) {
-            const geometry = new THREE.CylinderGeometry(0.4, 0.4, 0.1, 32);
-            const material = new THREE.MeshPhongMaterial({ 
-                color: 0xFFD700,
-                emissive: 0xFFD700,
-                emissiveIntensity: 0.5
-            });
-            const coin = new THREE.Mesh(geometry, material);
+            const coin = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.4, 0.4, 0.1, 32),
+                new THREE.MeshPhongMaterial({ color: 0xFFD700, emissive: 0xFFD700, emissiveIntensity: 0.5 })
+            );
             coin.position.set(x, y, z);
             coin.rotation.x = Math.PI / 2;
             scene.add(coin);
-            coins.push(coin);
+            gameObjects.push(coin);
         }
 
+        function createBuilding(x, z, color) {
+            const building = new THREE.Mesh(
+                new THREE.BoxGeometry(3, 5, 3),
+                new THREE.MeshPhongMaterial({ color })
+            );
+            building.position.set(x, 2.5, z);
+            building.castShadow = true;
+            scene.add(building);
+            objects.push(building);
+        }
+
+        function createTarget(x, y, z) {
+            const target = new THREE.Mesh(
+                new THREE.SphereGeometry(0.5, 16, 16),
+                new THREE.MeshPhongMaterial({ color: 0xFF0000 })
+            );
+            target.position.set(x, y, z);
+            scene.add(target);
+            return target;
+        }
+
+        function createRaceTrack() {
+            for(let i = 0; i < 20; i++) {
+                const segment = new THREE.Mesh(
+                    new THREE.BoxGeometry(10, 0.1, 5),
+                    new THREE.MeshPhongMaterial({ color: i % 2 === 0 ? 0x333333 : 0x666666 })
+                );
+                segment.position.set(0, 0, -i * 5);
+                segment.receiveShadow = true;
+                scene.add(segment);
+                objects.push(segment);
+            }
+        }
+
+        function createPet(x, y, z) {
+            const pet = new THREE.Mesh(
+                new THREE.SphereGeometry(0.5, 16, 16),
+                new THREE.MeshPhongMaterial({ color: Math.random() * 0xffffff })
+            );
+            pet.position.set(x, y, z);
+            scene.add(pet);
+            return pet;
+        }
+
+        function createClue(x, y, z) {
+            const clue = new THREE.Mesh(
+                new THREE.SphereGeometry(0.3, 16, 16),
+                new THREE.MeshPhongMaterial({ color: 0x00FFFF, emissive: 0x00FFFF, emissiveIntensity: 0.8 })
+            );
+            clue.position.set(x, y, z);
+            scene.add(clue);
+            return clue;
+        }
+
+        function createIsland(x, y, z) {
+            const island = new THREE.Mesh(
+                new THREE.BoxGeometry(8, 1, 8),
+                new THREE.MeshPhongMaterial({ color: 0x8B4513 })
+            );
+            island.position.set(x, y, z);
+            island.castShadow = true;
+            scene.add(island);
+            objects.push(island);
+        }
+
+        function createObstacle(x, y, z) {
+            const obstacle = new THREE.Mesh(
+                new THREE.BoxGeometry(2, 2, 2),
+                new THREE.MeshPhongMaterial({ color: 0xFF0000 })
+            );
+            obstacle.position.set(x, y, z);
+            obstacle.velocity = Math.random() * 0.1 + 0.05;
+            scene.add(obstacle);
+            return obstacle;
+        }
+
+        function createWall(x, y, z) {
+            const wall = new THREE.Mesh(
+                new THREE.BoxGeometry(0.5, 3, 5),
+                new THREE.MeshPhongMaterial({ color: 0x2a2a2a })
+            );
+            wall.position.set(x, y, z);
+            wall.castShadow = true;
+            scene.add(wall);
+            objects.push(wall);
+        }
+
+        function createTree(x, y, z) {
+            const trunk = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.3, 0.3, 2),
+                new THREE.MeshPhongMaterial({ color: 0x8B4513 })
+            );
+            trunk.position.set(x, y + 1, z);
+            scene.add(trunk);
+
+            const leaves = new THREE.Mesh(
+                new THREE.SphereGeometry(1, 8, 8),
+                new THREE.MeshPhongMaterial({ color: 0x228B22 })
+            );
+            leaves.position.set(x, y + 2.5, z);
+            scene.add(leaves);
+        }
+
+        function createArena() {
+            // Floor
+            createGround(0, 0, 20, 0.1, 20, 0x8B0000);
+            
+            // Walls
+            for(let i = 0; i < 4; i++) {
+                const wall = new THREE.Mesh(
+                    new THREE.BoxGeometry(i % 2 === 0 ? 20 : 0.5, 3, i % 2 === 0 ? 0.5 : 20),
+                    new THREE.MeshPhongMaterial({ color: 0x4a0000 })
+                );
+                const pos = i === 0 ? [0, 1.5, -10] : i === 1 ? [10, 1.5, 0] : i === 2 ? [0, 1.5, 10] : [-10, 1.5, 0];
+                wall.position.set(...pos);
+                scene.add(wall);
+            }
+        }
+
+        function createEnemy(x, y, z) {
+            const enemy = new THREE.Mesh(
+                new THREE.BoxGeometry(1, 2, 1),
+                new THREE.MeshPhongMaterial({ color: 0x8B0000 })
+            );
+            enemy.position.set(x, y, z);
+            scene.add(enemy);
+            gameObjects.push(enemy);
+        }
+
+        function createStructure(x, y, z) {
+            for(let i = 0; i < 3; i++) {
+                const block = new THREE.Mesh(
+                    new THREE.BoxGeometry(2, 2, 2),
+                    new THREE.MeshPhongMaterial({ color: Math.random() * 0xffffff })
+                );
+                block.position.set(x, y + i * 2, z);
+                scene.add(block);
+            }
+        }
+
+        // ANIMATION LOOP
         function animate() {
             animationId = requestAnimationFrame(animate);
 
-            // Player movement
+            if (!player) return;
+
             const MOVE_SPEED = 0.15;
             const JUMP_FORCE = 0.4;
             const GRAVITY = -0.02;
 
-            playerVelocity.y += GRAVITY;
-
+            // Movement
             if (keys['KeyW'] || keys['ArrowUp']) player.position.z -= MOVE_SPEED;
             if (keys['KeyS'] || keys['ArrowDown']) player.position.z += MOVE_SPEED;
             if (keys['KeyA'] || keys['ArrowLeft']) player.position.x -= MOVE_SPEED;
             if (keys['KeyD'] || keys['ArrowRight']) player.position.x += MOVE_SPEED;
 
-            if (keys['Space'] && isGrounded) {
-                playerVelocity.y = JUMP_FORCE;
+            // Gravity and jumping
+            if (playerVelocity) {
+                playerVelocity.y += GRAVITY;
+                if (keys['Space'] && isGrounded) {
+                    playerVelocity.y = JUMP_FORCE;
+                    isGrounded = false;
+                }
+                player.position.add(playerVelocity);
+
+                // Ground collision
                 isGrounded = false;
+                objects.forEach(obj => {
+                    const objBox = new THREE.Box3().setFromObject(obj);
+                    const playerBox = new THREE.Box3().setFromObject(player);
+                    if (playerBox.intersectsBox(objBox) && playerVelocity.y < 0) {
+                        player.position.y = obj.position.y + obj.geometry.parameters.height / 2 + 1.75;
+                        playerVelocity.y = 0;
+                        isGrounded = true;
+                    }
+                });
+
+                if (player.position.y < -10) {
+                    player.position.set(0, 3, 0);
+                    playerVelocity.set(0, 0, 0);
+                }
             }
 
-            player.position.add(playerVelocity);
-
-            // Check platform collisions
-            isGrounded = false;
-            platforms.forEach(platform => {
-                const platformBox = new THREE.Box3().setFromObject(platform);
-                const playerBox = new THREE.Box3().setFromObject(player);
-
-                if (playerBox.intersectsBox(platformBox) && playerVelocity.y < 0) {
-                    player.position.y = platform.position.y + platform.geometry.parameters.height / 2 + 1.75;
-                    playerVelocity.y = 0;
-                    isGrounded = true;
-                }
-            });
-
-            // Check coin collection
-            coins.forEach((coin, index) => {
-                if (player.position.distanceTo(coin.position) < 1.5) {
-                    scene.remove(coin);
-                    coins.splice(index, 1);
+            // Collect items
+            gameObjects.forEach((obj, index) => {
+                if (player.position.distanceTo(obj.position) < 1.5) {
+                    scene.remove(obj);
+                    gameObjects.splice(index, 1);
                     score += 10;
                 }
-                if (coin) coin.rotation.z += 0.05;
+                if (obj.rotation) obj.rotation.z += 0.05;
+                if (obj.velocity) obj.position.x += obj.velocity;
             });
-
-            // Reset if fall
-            if (player.position.y < -10) {
-                player.position.set(0, 3, 0);
-                playerVelocity.set(0, 0, 0);
-            }
 
             // Camera follow
             camera.position.x = player.position.x;
@@ -437,9 +668,7 @@
             renderer.render(scene, camera);
         }
 
-        // ================================
-        // INITIALIZE
-        // ================================
+        // Initialize
         renderGames();
         lucide.createIcons();
 
