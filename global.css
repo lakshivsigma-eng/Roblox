@@ -1,44 +1,5 @@
-/* ================================
-   ROBLOX DARK THEME - DESIGN SYSTEM
-   ================================ */
-
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
-
-:root {
-  /* Brand Colors */
-  --roblox-blue: #00A2FF;
-  --roblox-blue-hover: #0091E6;
-  
-  /* Backgrounds */
-  --bg-primary: #191B1D;
-  --bg-secondary: #232527;
-  --bg-tertiary: #2E3032;
-  --bg-hover: #393B3D;
-  
-  /* Text Colors */
-  --text-primary: #FFFFFF;
-  --text-secondary: #B8B8B8;
-  --text-tertiary: #8A8A8A;
-  
-  /* Accent Colors */
-  --green-positive: #02B757;
-  --red-negative: #FF4444;
-  
-  /* Border Radius - Signature 8px */
-  --radius-md: 8px;
-  
-  /* Spacing */
-  --spacing-sm: 8px;
-  --spacing-md: 12px;
-  --spacing-lg: 16px;
-  --spacing-xl: 24px;
-  
-  /* Typography */
-  --font-family: 'Nunito', 'Gotham', sans-serif;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --font-weight-black: 800;
-}
+/* ROBLOX REPLICA - EXACT MATCH */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap');
 
 * {
   margin: 0;
@@ -46,32 +7,19 @@
   box-sizing: border-box;
 }
 
-html {
-  font-size: 16px;
-}
-
 body {
-  font-family: var(--font-family);
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  line-height: 1.5;
+  font-family: 'Nunito', sans-serif;
+  background-color: #191B1D;
+  color: #FFFFFF;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-/* ================================
-   NAVIGATION
-   ================================ */
-
+/* NAVBAR */
 .navbar {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background-color: var(--bg-secondary);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background-color: #232527;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .navbar-container {
@@ -80,20 +28,22 @@ a {
   display: flex;
   align-items: center;
   padding: 12px 24px;
-  gap: var(--spacing-lg);
+  gap: 16px;
 }
 
 .navbar-logo {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  font-size: 1.5rem;
-  font-weight: var(--font-weight-black);
+  gap: 8px;
+  font-size: 24px;
+  font-weight: 800;
+  color: #FFFFFF;
+  text-decoration: none;
 }
 
 .navbar-nav {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: 8px;
   list-style: none;
 }
 
@@ -102,16 +52,18 @@ a {
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  border-radius: var(--radius-md);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-secondary);
-  transition: all 0.2s;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #B8B8B8;
+  text-decoration: none;
+  transition: 0.2s;
 }
 
 .nav-link:hover,
 .nav-link.active {
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
+  background-color: #2E3032;
+  color: #FFFFFF;
 }
 
 .navbar-search {
@@ -123,16 +75,20 @@ a {
 .search-input {
   width: 100%;
   padding: 10px 16px 10px 44px;
-  background-color: var(--bg-tertiary);
-  border: 1px solid transparent;
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-family: var(--font-family);
+  background-color: #2E3032;
+  border: none;
+  border-radius: 8px;
+  color: #FFFFFF;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+}
+
+.search-input::placeholder {
+  color: #8A8A8A;
 }
 
 .search-input:focus {
-  outline: none;
-  border-color: var(--roblox-blue);
+  outline: 2px solid #00A2FF;
 }
 
 .search-icon {
@@ -140,12 +96,13 @@ a {
   left: 14px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--text-tertiary);
+  color: #8A8A8A;
+  pointer-events: none;
 }
 
 .navbar-actions {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: 8px;
 }
 
 .navbar-icon-btn {
@@ -154,49 +111,47 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--bg-tertiary);
+  background-color: #2E3032;
   border: none;
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
+  border-radius: 8px;
+  color: #B8B8B8;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: 0.2s;
 }
 
 .navbar-icon-btn:hover {
-  background-color: var(--bg-hover);
+  background-color: #393B3D;
+  color: #FFFFFF;
 }
 
-/* ================================
-   GAME CARDS
-   ================================ */
-
+/* GAMES GRID - EXACT ROBLOX LAYOUT */
 .games-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 20px;
-  padding: 32px 24px;
+  gap: 16px;
+  padding: 24px;
   max-width: 1920px;
   margin: 0 auto;
 }
 
+/* GAME CARD */
 .game-card {
-  background-color: var(--bg-secondary);
-  border-radius: var(--radius-md);
+  background-color: #232527;
+  border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: transform 0.2s;
 }
 
 .game-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 162, 255, 0.2);
 }
 
 .game-card-thumbnail {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: var(--bg-tertiary);
+  background-color: #2E3032;
   overflow: hidden;
 }
 
@@ -209,12 +164,12 @@ a {
 .play-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: 0.2s;
 }
 
 .game-card:hover .play-overlay {
@@ -224,59 +179,51 @@ a {
 .play-button {
   width: 56px;
   height: 56px;
-  background: var(--roblox-blue);
+  background-color: #00A2FF;
   border-radius: 50%;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: scale(0.8);
-  transition: transform 0.3s;
-}
-
-.game-card:hover .play-button {
-  transform: scale(1);
 }
 
 .game-card-content {
-  padding: 14px;
+  padding: 12px;
 }
 
 .game-card-title {
-  font-size: 1rem;
-  font-weight: var(--font-weight-bold);
+  font-size: 16px;
+  font-weight: 700;
+  color: #FFFFFF;
   margin-bottom: 8px;
 }
 
 .game-card-stats {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8125rem;
-  font-weight: var(--font-weight-semibold);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .like-percentage {
-  color: var(--green-positive);
+  color: #02B757;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
 .player-count {
-  color: var(--text-secondary);
+  color: #B8B8B8;
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-/* ================================
-   GAME MODAL
-   ================================ */
-
+/* GAME MODAL */
 .game-modal {
   position: fixed;
   inset: 0;
-  background: #000;
+  background: #000000;
   z-index: 9999;
   display: none;
 }
@@ -291,7 +238,7 @@ a {
   left: 0;
   right: 0;
   background: rgba(35, 37, 39, 0.95);
-  padding: 12px 24px;
+  padding: 16px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -299,18 +246,19 @@ a {
 }
 
 .game-title {
-  font-size: 1.25rem;
-  font-weight: var(--font-weight-bold);
+  font-size: 20px;
+  font-weight: 800;
 }
 
 .close-btn {
-  background: var(--red-negative);
-  color: white;
+  background-color: #FF4444;
+  color: #FFFFFF;
   border: none;
-  padding: 8px 20px;
-  border-radius: var(--radius-md);
-  font-weight: var(--font-weight-bold);
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 700;
   cursor: pointer;
+  font-family: 'Nunito', sans-serif;
 }
 
 .game-canvas {
@@ -318,10 +266,7 @@ a {
   height: 100%;
 }
 
-/* ================================
-   RESPONSIVE
-   ================================ */
-
+/* RESPONSIVE */
 @media (max-width: 1400px) {
   .games-grid { grid-template-columns: repeat(4, 1fr); }
 }
@@ -331,7 +276,10 @@ a {
 }
 
 @media (max-width: 768px) {
-  .games-grid { grid-template-columns: repeat(2, 1fr); }
+  .games-grid { 
+    grid-template-columns: repeat(2, 1fr);
+    padding: 16px;
+  }
   .navbar-nav { display: none; }
 }
 
