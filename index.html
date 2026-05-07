@@ -8,8 +8,150 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hebo:wght@400;500;700&display=swap">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Link to your external CSS file -->
-    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --rbx-bg-primary: #191B1D;
+            --rbx-bg-secondary: #232527;
+            --rbx-text-main: #FFFFFF;
+            --rbx-text-muted: #B8B8B8;
+            --rbx-brand-blue: #00A2FF;
+            --rbx-border: #3A3D40;
+            --rbx-radius: 8px;
+            --rbx-font-stack: 'Hebo', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--rbx-bg-primary);
+            color: var(--rbx-text-main);
+            font-family: var(--rbx-font-stack);
+            overflow-x: hidden;
+            padding-top: 64px;
+        }
+
+        /* NAVIGATION */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 64px;
+            background-color: var(--rbx-bg-secondary);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+            border-bottom: 1px solid var(--rbx-border);
+        }
+
+        .logo { font-weight: 900; font-size: 24px; cursor: pointer; color: white; text-decoration: none; margin-right: 30px; letter-spacing: -1px; }
+
+        .nav-link {
+            color: var(--rbx-text-main);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: var(--rbx-radius);
+            cursor: pointer;
+        }
+
+        .nav-link:hover { background: rgba(255, 255, 255, 0.1); }
+
+        .search-bar { flex-grow: 1; max-width: 500px; position: relative; margin: 0 20px; }
+        .search-bar input {
+            width: 100%;
+            background: var(--rbx-bg-primary);
+            border: 1px solid var(--rbx-border);
+            border-radius: var(--rbx-radius);
+            padding: 8px 12px 8px 35px;
+            color: white;
+            outline: none;
+        }
+        .search-bar i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--rbx-text-muted); }
+
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+        .nav-icon { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+
+        /* LAYOUT */
+        .main-wrapper { display: flex; max-width: 1400px; margin: 0 auto; padding: 20px; gap: 30px; }
+        .content-area { flex-grow: 1; min-width: 0; }
+
+        .section-header { margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .section-title { font-size: 22px; font-weight: 700; }
+
+        .scroller { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 15px; scrollbar-width: thin; }
+
+        /* GAME CARDS */
+        .game-card {
+            min-width: 180px;
+            max-width: 180px;
+            background: var(--rbx-bg-secondary);
+            border-radius: var(--rbx-radius);
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 1px solid transparent;
+            position: relative;
+        }
+
+        .game-card:hover { transform: translateY(-4px); border-color: var(--rbx-brand-blue); }
+
+        .thumbnail-container { position: relative; width: 100%; aspect-ratio: 16/9; }
+        .thumbnail { width: 100%; height: 100%; background: #333; object-fit: cover; }
+
+        .play-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .game-card:hover .play-overlay { opacity: 1; }
+        .play-icon { font-size: 32px; color: white; margin-bottom: 5px; }
+        .play-text { font-size: 10px; font-weight: 700; text-transform: uppercase; color: white; background: var(--rbx-brand-blue); padding: 2px 6px; border-radius: 4px; }
+
+        .card-info { padding: 10px; }
+        .game-name { font-weight: 600; font-size: 14px; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .game-stats { font-size: 11px; color: var(--rbx-text-muted); display: flex; gap: 8px; }
+
+        .discover-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+
+        /* SIDEBAR */
+        .sidebar { width: 280px; background: var(--rbx-bg-secondary); border-radius: var(--rbx-radius); padding: 20px; height: fit-content; }
+        .friend-row { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+        .avatar { width: 40px; height: 40px; background: #444; border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; color: #888; font-size: 20px; }
+        .status-dot { position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background: #00E676; border: 2px solid var(--rbx-bg-secondary); border-radius: 50%; }
+
+        /* TOAST NOTIFICATION */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--rbx-bg-secondary);
+            border: 1px solid var(--rbx-brand-blue);
+            padding: 12px 24px;
+            border-radius: 50px;
+            display: none;
+            z-index: 3000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            animation: slideUp 0.3s ease;
+            color: white;
+            white-space: nowrap;
+        }
+
+        @keyframes slideUp { from { bottom: -50px; } to { bottom: 20px; } }
+
+        .view { display: none; }
+        .view.active { display: block; }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none !important; }
+        }
+    </style>
 </head>
 <body>
 
@@ -56,18 +198,19 @@
         </div>
     </div>
 
-    <div id="toast">🚀 Opening on itch.io...</div>
+    <div id="toast">🚀 Opening on CrazyGames...</div>
 
     <script>
+        // Updated Games List targeting CrazyGames
         const gamesData = [
-            { title: "Trees Hate You", players: "152K", likes: "96%", img: "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=400", url: "https://itch.io/search?q=trees+hate+you" },
-            { title: "Friday Night Funkin'", players: "1.2M", likes: "98%", img: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=400", url: "https://ninja-muffin24.itch.io/funkin" },
-            { title: "Celeste Classic", players: "45K", likes: "99%", img: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400", url: "https://maddy-thorson.itch.io/celeste-classic" },
-            { title: "Sort the Court!", players: "200K", likes: "94%", img: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400", url: "https://graebor.itch.io/sort-the-court" },
-            { title: "A Short Hike", players: "88K", likes: "97%", img: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=400", url: "https://adamgryu.itch.io/a-short-hike" },
-            { title: "Minit", players: "12K", likes: "91%", img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400", url: "https://moshboy.itch.io/minit" },
-            { title: "Baba Is You", players: "55K", likes: "96%", img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400", url: "https://hempuli.itch.io/baba-is-you" },
-            { title: "The Doll Shop", players: "15K", likes: "89%", img: "https://images.unsplash.com/photo-1551103756-c4eb202270ff?w=400", url: "https://atelier-sentô.itch.io/the-doll-shop" }
+            { title: "Trees Hate You", players: "152K", likes: "96%", img: "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=400", url: "https://www.crazygames.com/search?q=trees+hate+you" },
+            { title: "Shell Shockers", players: "2.1M", likes: "95%", img: "https://images.unsplash.com/photo-1580234811497-9df7fd2f357e?w=400", url: "https://www.crazygames.com/game/shell-shockers" },
+            { title: "Slope", players: "1.5M", likes: "92%", img: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=400", url: "https://www.crazygames.com/game/slope" },
+            { title: "Moto X3M", players: "800K", likes: "97%", img: "https://images.unsplash.com/photo-1558981403-c5f91bbde3ec?w=400", url: "https://www.crazygames.com/game/moto-x3m" },
+            { title: "Bloxd.io", players: "1.1M", likes: "94%", img: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400", url: "https://www.crazygames.com/game/bloxd-io" },
+            { title: "Ragdoll Archers", players: "340K", likes: "91%", img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400", url: "https://www.crazygames.com/game/ragdoll-archers" },
+            { title: "EvoWorld.io", players: "500K", likes: "89%", img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400", url: "https://www.crazygames.com/game/evoworld-io" },
+            { title: "Friday Night Funkin'", players: "2.5M", likes: "99%", img: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400", url: "https://www.crazygames.com/game/friday-night-funkin" }
         ];
 
         function createCard(game) {
@@ -79,7 +222,7 @@
                     <img src="${game.img}" class="thumbnail" alt="${game.title}" loading="lazy">
                     <div class="play-overlay">
                         <i class="fas fa-play-circle play-icon"></i>
-                        <span class="play-text">PLAY ON ITCH.IO</span>
+                        <span class="play-text">PLAY ON CRAZYGAMES</span>
                     </div>
                 </div>
                 <div class="card-info">
@@ -113,10 +256,15 @@
 
         function launch(game) {
             const toast = document.getElementById('toast');
-            toast.innerText = `🚀 Opening ${game.title} on itch.io...`;
+            toast.innerText = `🚀 Opening ${game.title} on CrazyGames...`;
             toast.style.display = 'block';
+            
+            // Redirect or open in new window
             window.open(game.url, '_blank');
-            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
         }
 
         function switchView(view) {
